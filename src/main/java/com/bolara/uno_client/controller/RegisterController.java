@@ -4,21 +4,23 @@ import com.bolara.uno_client.StageManager;
 import com.bolara.uno_client.config.Constants;
 import com.bolara.uno_client.service.AuthService;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.control.PasswordField;
-import javafx.stage.Stage;
+import javafx.scene.control.TextField;
 
-import java.io.IOException;
+public class RegisterController {
 
-public class LoginController {
     @FXML
     private TextField usernameField;
 
     @FXML
+    private TextField emailField;
+
+    @FXML
     private PasswordField passwordField;
+
+    @FXML
+    private TextField reminderField;
 
     @FXML
     private Label statusLabel;
@@ -26,21 +28,23 @@ public class LoginController {
     private final AuthService authService = new AuthService();
 
     @FXML
-    private void handleLogin() {
+    private void handleRegister() {
         String username = usernameField.getText();
+        String email = emailField.getText();
         String password = passwordField.getText();
+        String reminder = reminderField.getText();
 
-        if (username.isBlank() || password.isBlank()) {
-            statusLabel.setText("Username and password cannot be blank");
+        if (username.isBlank() || email.isBlank() || password.isBlank()) {
+            statusLabel.setText("Username, email and password cannot be blank");
             return;
         }
 
-        String response = authService.login(username, password);
+        String response = authService.register(username, password, email, reminder);
         statusLabel.setText(response);
     }
 
     @FXML
-    private void openRegister() {
-        StageManager.switchScene(Constants.SCENE_REGISTER);
+    private void openLogin() {
+        StageManager.switchScene(Constants.SCENE_LOGIN);
     }
 }

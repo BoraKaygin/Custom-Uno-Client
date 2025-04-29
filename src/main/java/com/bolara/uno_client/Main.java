@@ -1,5 +1,6 @@
 package com.bolara.uno_client;
 
+import com.bolara.uno_client.config.Constants;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -10,13 +11,12 @@ import java.util.Objects;
 
 public class Main extends Application {
     @Override
-    public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/login.fxml")));
+    public void start(Stage primaryStage) throws Exception {
+        StageManager.stage = primaryStage;
+        primaryStage.setTitle("UNO Game");
 
-        Scene scene = new Scene(root, 400, 300);
-        stage.setTitle("UNO Game - Login");
-        stage.setScene(scene);
-        stage.show();
+        StageManager.switchScene(Constants.SCENE_LOGIN);
+        primaryStage.show();
     }
 
     public static void main(String[] args) {
