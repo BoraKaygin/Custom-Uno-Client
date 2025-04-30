@@ -5,13 +5,25 @@ public class Constants {
 
     public static final String URL_LOGIN = URL_BASE + "/login";
     public static final String URL_REGISTER = URL_BASE + "/register";
+    public static final String URL_PASSWORD_REMINDER_GET = URL_BASE + "/password-reminder/get";
 
     public static final String CT_URL_ENCODED = "application/x-www-form-urlencoded";
     public static final String CT_APP_JSON = "application/json";
 
     public static final String SCENE_REGISTER = "/register.fxml";
     public static final String SCENE_LOGIN = "/login.fxml";
+    public static final String SCENE_PASSWORD_REMINDER = "/password_reminder.fxml";
 
     public static final int WindowWidth = 1600;
     public static final int WindowHeight = 900;
+
+    public static final String URL_PASSWORD_RESET_REQUEST = URL_BASE + "/password-reset/request";
+    public static final String URL_PASSWORD_RESET_CONFIRM = URL_BASE + "/password-reset/confirm";
+   // public static final String SCENE_PASSWORD_RESET_REQUEST = "/password_reset_request.fxml";
+   // public static final String SCENE_PASSWORD_RESET_CONFIRM = "/password_reset_confirm.fxml";
+    public static final String SCENE_PASSWORD_RESET = "/password_reset.fxml";
+
+
+
+
 }

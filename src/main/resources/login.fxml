@@ -11,11 +11,17 @@
       spacing="15" alignment="CENTER">
     <Label text="Login" style="-fx-font-size: 20px;"/>
 
-    <TextField fx:id="usernameField" promptText="Username" maxWidth="300"/>
-    <PasswordField fx:id="passwordField" promptText="Password" maxWidth="300"/>
+    <TextField fx:id="usernameField" promptText="Username" />
+    <PasswordField fx:id="passwordField" promptText="Password" />
 
-    <Button text="Login" onAction="#handleLogin"/>
-    <Label fx:id="statusLabel" textFill="red"/>
+    <Button text="Login" styleClass="button-type1" onAction="#handleLogin"/>
+    <Button text="Register" styleClass="button-type1" onAction="#openRegister"/>
 
-    <Button text="Register" onAction="#openRegister"/>
+    <Label fx:id="statusLabel" textFill="#2b2736"/>
+
+    <Label text="Did you forget your password? No problem!" style="-fx-font-size: 16px;"/>
+    <Button text="Password Reminder" styleClass="button-type2" onAction="#openReminder"/>
+    <Button text="Reset Password" styleClass="button-type2"  onAction="#openPasswordReset" />
+
+
 </VBox>

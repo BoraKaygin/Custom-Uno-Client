@@ -1,0 +1,41 @@
+/* styles.css */
+
+/* Make buttons modern */
+.button {
+    -fx-font-weight: bold;
+    -fx-background-radius: 10;
+    -fx-padding: 8 20;
+    -fx-font-size: 14px;
+    -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.4), 4, 0.0, 2, 2);
+    -fx-min-width: 150;
+}
+
+.button-type1 {
+    -fx-background-color: linear-gradient(to right, #00c6ff, #0072ff);
+    -fx-text-fill: white;
+}
+
+.button-type2 {
+    -fx-background-color: linear-gradient(to right, #f6a96a, #ff6c59);
+    -fx-text-fill: white;
+}
+
+
+
+/* Stylish text fields */
+.text-field, .password-field {
+    -fx-max-width: 300;
+    -fx-background-color: #f3f3f3;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1;
+    -fx-padding: 6 10;
+    -fx-font-size: 13px;
+}
+
+/* Error labels or status messages */
+.label {
+    -fx-text-fill: #444;
+    -fx-font-size: 13px;
+}

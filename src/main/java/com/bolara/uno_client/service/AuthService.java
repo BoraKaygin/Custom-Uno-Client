@@ -51,4 +51,82 @@ public class AuthService {
             return "Registration failed";
         }
     }
+
+    public String getPasswordReminder(String email) {
+        try {
+            String requestBody = "{\"email\":\"" + email + "\"}";
+
+            HttpResponse<String> response = HttpClientWrapper.sendRequest(
+                    Constants.URL_PASSWORD_REMINDER_GET, requestBody, Constants.CT_APP_JSON);
+
+            if (response.statusCode() != 200) {
+                System.err.println("Failed to fetch reminder: " + response.body());
+                return null;
+            }
+
+            System.out.println("Response body: " + response.body());
+            String responseBody = response.body();
+            JsonNode json = HttpClientWrapper.objectMapper.readTree(responseBody);
+            return json.has("message") ? json.get("message").asText() : null;
+
+        } catch (Exception e) {
+            System.err.println("Error while retrieving password reminder: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public String requestPasswordReset(String email) {
+        try {
+            String requestBody = "{\"email\":\"" + email + "\"}";
+
+            HttpResponse<String> response = HttpClientWrapper.sendRequest(
+                    Constants.URL_PASSWORD_RESET_REQUEST,
+                    requestBody,
+                    Constants.CT_APP_JSON
+            );
+
+            if (response.statusCode() != 200) {
+                return "Reset request failed: " + response.body();
+            }
+
+            JsonNode json = HttpClientWrapper.objectMapper.readTree(response.body());
+            return json.get("message").asText();
+
+        } catch (Exception e) {
+            System.err.println("Error during password reset request: " + e.getMessage());
+            return "An error occurred.";
+        }
+    }
+
+    public String resetPassword(String token, String newPassword) {
+        try {
+            String requestBody = String.format(
+                    "{\"token\":\"%s\", \"newPassword\":\"%s\"}",
+                    token, newPassword
+            );
+
+            HttpResponse<String> response = HttpClientWrapper.sendRequest(
+                    Constants.URL_PASSWORD_RESET_CONFIRM,
+                    requestBody,
+                    Constants.CT_APP_JSON
+            );
+
+            if (response.statusCode() != 200) {
+                return "Reset failed: " + response.body();
+            }
+
+            JsonNode json = HttpClientWrapper.objectMapper.readTree(response.body());
+            return json.get("message").asText();
+
+        } catch (Exception e) {
+            System.err.println("Error during password reset confirm: " + e.getMessage());
+            return "An error occurred.";
+        }
+    }
+
+
+
+
+
+
 }

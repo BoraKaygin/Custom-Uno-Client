@@ -43,4 +43,12 @@ public class LoginController {
     private void openRegister() {
         StageManager.switchScene(Constants.SCENE_REGISTER);
     }
+
+    @FXML
+    private void openReminder() { StageManager.switchScene(Constants.SCENE_PASSWORD_REMINDER); }
+
+    @FXML
+    private void openPasswordReset() { StageManager.switchScene(Constants.SCENE_PASSWORD_RESET); }
+
+
 }
