@@ -50,5 +50,8 @@ public class LoginController {
     @FXML
     private void openPasswordReset() { StageManager.switchScene(Constants.SCENE_PASSWORD_RESET); }
 
+    @FXML
+    private void openLeaderboard() { StageManager.switchScene(Constants.SCENE_LEADERBOARD); }
+
 
 }

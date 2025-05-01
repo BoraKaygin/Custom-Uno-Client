@@ -22,4 +22,8 @@ public class HttpClientWrapper {
 
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
+
+    public static HttpClient getClient() {
+        return client;
+    }
 }

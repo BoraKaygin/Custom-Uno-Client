@@ -23,6 +23,12 @@ public class Constants {
    // public static final String SCENE_PASSWORD_RESET_CONFIRM = "/password_reset_confirm.fxml";
     public static final String SCENE_PASSWORD_RESET = "/password_reset.fxml";
 
+    public static final String URL_LEADERBOARD_WEEK = URL_BASE + "/leaderboard/week";
+    public static final String URL_LEADERBOARD_MONTH = URL_BASE + "/leaderboard/month";
+    public static final String URL_LEADERBOARD_ALL = URL_BASE + "/leaderboard/";
+
+    public static final String SCENE_LEADERBOARD = "/leaderboard.fxml";
+
 
 
 

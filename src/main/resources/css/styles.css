@@ -20,6 +20,11 @@
     -fx-text-fill: white;
 }
 
+.button-type3 {
+    -fx-background-color: linear-gradient(to right, #f1db31, #fca033);
+    -fx-text-fill: white;
+}
+
 
 
 /* Stylish text fields */
@@ -39,3 +44,16 @@
     -fx-text-fill: #444;
     -fx-font-size: 13px;
 }
+
+.leaderboard-table {
+    -fx-max-width: 500;
+    -fx-font-size: 14px;
+    -fx-table-cell-border-color: lightgray;
+    -fx-background-color: white;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #e0e0e0;
+}
+
+
