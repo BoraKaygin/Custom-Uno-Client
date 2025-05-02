@@ -26,6 +26,15 @@
 }
 
 
+.hand {
+    -fx-border-color: red;
+    -fx-border-width: 2;
+}
+
+.hand-right {
+    -fx-border-color: blue;
+    -fx-border-width: 2;
+}
 
 /* Stylish text fields */
 .text-field, .password-field {

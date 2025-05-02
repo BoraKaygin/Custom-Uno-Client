@@ -34,6 +34,7 @@ public class MenuController {
         System.out.println("Start Game clicked");
         GameManager gameManager = GameManager.getInstance();
         gameManager.createSinglePlayerGame();
+        StageManager.switchScene(Constants.SCENE_GAME);
     }
 
     @FXML

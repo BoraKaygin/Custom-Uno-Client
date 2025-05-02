@@ -2,11 +2,38 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
+<BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.bolara.uno_client.controller.GameController">
 
-    <Button text="Back to Menu" onAction="#handleBackToMenu"
-            layoutX="20" layoutY="20" styleClass="button button-type3"/>
+    <!-- Top: Back button + top hand -->
+    <top>
+        <VBox spacing="10">
+            <HBox>
+                <Button text="Back to Menu"
+                        onAction="#handleBackToMenu"
+                        styleClass="button-type3"
+                        maxWidth="150" />
+            </HBox>
+            <HBox fx:id="topHand" spacing="10" alignment="CENTER" styleClass="cpu-top"/>
+        </VBox>
+    </top>
 
-</AnchorPane>
+    <bottom>
+        <HBox fx:id="playerHand" spacing="10" alignment="CENTER" styleClass="player-hand" />
+    </bottom>
+
+    <left>
+        <VBox fx:id="leftHand" spacing="10" alignment="CENTER" styleClass="cpu-left" />
+    </left>
+
+    <right>
+        <VBox fx:id="rightHand" spacing="10" alignment="CENTER" styleClass="cpu-right"/>
+    </right>
+
+    <center>
+        <Label text="UNO GAME" style="-fx-font-size: 24px;"/>
+    </center>
+</BorderPane>
+
+
