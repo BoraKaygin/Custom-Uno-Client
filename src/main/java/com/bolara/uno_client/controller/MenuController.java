@@ -8,6 +8,8 @@ public class MenuController {
 
     @FXML
     private void handleStartGame() {
+        // TODO: Navigate to actual game scene
+        //System.out.println("Start Game clicked");
         StageManager.switchScene(Constants.SCENE_GAME);
     }
 
