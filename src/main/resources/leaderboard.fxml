@@ -21,5 +21,6 @@
     </TableView>
 
 
-    <Button text="Back to Login" styleClass="button-type3" onAction="#handleBack" />
+    <Button text="Back to Menu" styleClass="button-type3" onAction="#handleBack" />
+
 </VBox>

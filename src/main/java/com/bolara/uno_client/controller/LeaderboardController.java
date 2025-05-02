@@ -86,6 +86,6 @@ public class LeaderboardController {
 
     @FXML
     private void handleBack() {
-        StageManager.switchScene(Constants.SCENE_LOGIN);
+        StageManager.switchScene(Constants.SCENE_MENU);
     }
 }

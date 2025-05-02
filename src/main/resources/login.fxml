@@ -13,7 +13,6 @@
 
     <Button text="Login" styleClass="button-type1" onAction="#handleLogin"/>
     <Button text="Register" styleClass="button-type1" onAction="#openRegister"/>
-    <Button text="View Leaderboard" styleClass="button-type3" onAction="#openLeaderboard" />
 
     <Label fx:id="statusLabel" textFill="#2b2736"/>
 

@@ -37,6 +37,8 @@ public class LoginController {
 
         String response = authService.login(username, password);
         statusLabel.setText(response);
+        StageManager.switchScene(Constants.SCENE_MENU);
+
     }
 
     @FXML

@@ -29,6 +29,11 @@ public class Constants {
 
     public static final String SCENE_LEADERBOARD = "/leaderboard.fxml";
 
+    public static final String SCENE_MENU = "/menu.fxml";
+
+
+
+
 
 
 
