@@ -3,11 +3,17 @@ package com.bolara.uno_client.service;
 import com.bolara.uno_client.HttpClientWrapper;
 import com.bolara.uno_client.config.Constants;
 import com.bolara.uno_client.dto.RegistrationRequest;
+import com.bolara.uno_client.session.SessionManager;
 import com.fasterxml.jackson.databind.JsonNode;
+import javafx.util.Pair;
 
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 public class AuthService {
+    HttpClient client = HttpClient.newHttpClient();
+
     public String register(String username, String password, String email, String reminder) {
         try {
             String requestBody = new RegistrationRequest.Builder()
@@ -18,7 +24,7 @@ public class AuthService {
                     .build()
                     .toJson();
 
-            HttpResponse<String> response = HttpClientWrapper.sendRequest(Constants.URL_REGISTER, requestBody, Constants.CT_APP_JSON);
+            HttpResponse<String> response = HttpClientWrapper.sendBasicPostRequest(Constants.URL_REGISTER, requestBody, Constants.CT_APP_JSON);
 
             JsonNode jsonNode = HttpClientWrapper.objectMapper.readTree(response.body());
             return jsonNode.get("message").asText();
@@ -28,27 +34,56 @@ public class AuthService {
         }
     }
 
-    public String login(String username, String password) {
+    public Pair<Boolean, String> login(String username, String password) {
         try {
             String requestBody = "username=" + username + "&password=" + password;
 
-            HttpResponse<String> response = HttpClientWrapper.sendRequest(Constants.URL_LOGIN, requestBody, Constants.CT_URL_ENCODED);
-            String location = response.headers().firstValue("Location").orElse(null);
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(java.net.URI.create(Constants.URL_LOGIN))
+                    .header("Content-Type", Constants.CT_URL_ENCODED)
+                    .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                    .build();
 
-            if (response.statusCode() != 302 || location == null) {
-                System.err.println("Login failed: " + response.body());
-                return "Login failed";
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            int status = response.statusCode();
+            String location = response.headers().firstValue("Location").orElse("");
+
+            if (response.statusCode() != 302 || location.contains("error")) {
+                return new Pair<>(false, "Login failed: Invalid credentials");
             }
 
-            boolean success = location.equals(Constants.URL_BASE + "/");
-            if (success) {
-                return "Login successful";
+            String setCookieHeader = response.headers().firstValue("Set-Cookie").orElse(null);
+            if (setCookieHeader != null) {
+                String sessionId = setCookieHeader.split(";")[0]; // Extract JSESSIONID=...
+                SessionManager.setSessionCookie(sessionId);
+                SessionManager.setUsername(username);
             } else {
-                return "Login failed: Bad Credentials";
+                System.err.println("Set-Cookie header not found");
+                return new Pair<>(false, "Login failed: No session cookie");
             }
+
+            return new Pair<>(true, "Login successful");
+
         } catch (Exception e) {
             System.err.println("Error while logging in: " + e.getMessage());
-            return "Registration failed";
+            e.printStackTrace();
+            return new Pair<>(false, "Login failed due to exception");
+        }
+    }
+
+
+    public Pair<Boolean, String> logout() {
+        try {
+            HttpResponse<String> response = HttpClientWrapper.sendBasicPostRequest(Constants.URL_LOGOUT, "", Constants.CT_URL_ENCODED);
+            if (response.statusCode() != 302) {
+                System.err.println("Logout failed: " + response.body());
+                return new Pair<Boolean, String>(false, "Logout failed");
+            } else {
+                return new Pair<Boolean, String>(true, "Logout successful");
+            }
+        } catch (Exception e) {
+            System.err.println("Error while logging out: " + e.getMessage());
+            return new Pair<Boolean, String>(false, "Logout failed");
         }
     }
 
@@ -56,7 +91,7 @@ public class AuthService {
         try {
             String requestBody = "{\"email\":\"" + email + "\"}";
 
-            HttpResponse<String> response = HttpClientWrapper.sendRequest(
+            HttpResponse<String> response = HttpClientWrapper.sendBasicPostRequest(
                     Constants.URL_PASSWORD_REMINDER_GET, requestBody, Constants.CT_APP_JSON);
 
             if (response.statusCode() != 200) {
@@ -79,7 +114,7 @@ public class AuthService {
         try {
             String requestBody = "{\"email\":\"" + email + "\"}";
 
-            HttpResponse<String> response = HttpClientWrapper.sendRequest(
+            HttpResponse<String> response = HttpClientWrapper.sendBasicPostRequest(
                     Constants.URL_PASSWORD_RESET_REQUEST,
                     requestBody,
                     Constants.CT_APP_JSON
@@ -105,7 +140,7 @@ public class AuthService {
                     token, newPassword
             );
 
-            HttpResponse<String> response = HttpClientWrapper.sendRequest(
+            HttpResponse<String> response = HttpClientWrapper.sendBasicPostRequest(
                     Constants.URL_PASSWORD_RESET_CONFIRM,
                     requestBody,
                     Constants.CT_APP_JSON
@@ -123,10 +158,6 @@ public class AuthService {
             return "An error occurred.";
         }
     }
-
-
-
-
 
 
 }

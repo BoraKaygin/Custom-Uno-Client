@@ -9,8 +9,9 @@
 
     <Label text="Welcome to UNO!" style="-fx-font-size: 24px;" />
 
-    <Button text="Start Game" onAction="#handleStartGame" styleClass="button button-type1" />
+    <Button text="Create Game" onAction="#handleCreateGame" styleClass="button button-type1" />
     <Button text="Leaderboard" onAction="#handleLeaderboard" styleClass="button button-type2" />
     <Button text="Logout" onAction="#handleLogout" styleClass="button button-type3" />
+    <Label fx:id="statusLabel" textFill="#2b2736" style="-fx-font-size: 16px;"/>
 
 </VBox>

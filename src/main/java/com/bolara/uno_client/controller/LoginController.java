@@ -10,6 +10,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.PasswordField;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 
 import java.io.IOException;
 
@@ -35,10 +36,11 @@ public class LoginController {
             return;
         }
 
-        String response = authService.login(username, password);
-        statusLabel.setText(response);
-        StageManager.switchScene(Constants.SCENE_MENU);
-
+        Pair<Boolean,String> response = authService.login(username, password);
+        statusLabel.setText(response.getValue());
+        if (response.getKey()) {
+            StageManager.switchScene(Constants.SCENE_MENU);
+        }
     }
 
     @FXML
