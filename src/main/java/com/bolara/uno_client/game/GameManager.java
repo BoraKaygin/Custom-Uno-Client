@@ -26,17 +26,21 @@ public class GameManager {
         return instance;
     }
 
-    public static void resetInstance() {
+    public void resetInstance() {
+        instance.stopPolling();
+        instance.removeGame();
         instance = null;
     }
 
     public void createSinglePlayerGame() {
-        gameId = createGame();
-        assert joinGame(gameId);
+        instance.gameId = createGame();
+        boolean joined = joinGame(gameId);
+        assert joined;
         for (int i = 0; i < 3; i++) {
             addComputerPlayer();
         }
-        assert startGame();
+        boolean started = startGame();
+        assert started;
     }
 
     private String createGame() {
@@ -69,7 +73,7 @@ public class GameManager {
         return true;
     }
 
-    public boolean playCard(int playerIndex, int cardIndex, String declaredColor) {
+    public boolean playCard(int playerIndex, int cardIndex, Card.Color declaredColor) {
         if (gameId == null) {
             System.err.println("Game ID is null. Cannot play card.");
             return false;
@@ -91,6 +95,14 @@ public class GameManager {
             System.err.println("Failed to play cheat card.");
         }
         return played;
+    }
+
+    public boolean setTopCardColor(Card.Color color) {
+        if (gameId == null) {
+            System.err.println("Game ID is null. Cannot set top card color.");
+            return false;
+        }
+        return NetworkController.setTopCardColor(gameId, color);
     }
 
     public boolean drawCard(int playerIndex) {
@@ -116,12 +128,12 @@ public class GameManager {
         }
     }
 
-    private Game getGame() {
+    public Game getGame() {
         if (gameId == null) {
             System.err.println("Game ID is null. Cannot get game.");
             return null;
         }
-        game = NetworkController.getGame(gameId);
+        Game game = NetworkController.getGame(gameId);
         if (game == null) {
             System.err.println("Failed to get game.");
             return null;
@@ -146,11 +158,11 @@ public class GameManager {
             public void run() {
                 Game fetchedGame = getGame();
                 if (fetchedGame != null) {
-                    game = fetchedGame;
+                    instance.game = fetchedGame;
                     onUpdate.accept(fetchedGame);
                 }
             }
-        }, 0, 200000); // In milliseconds. Set this to 2000 later
+        }, 0, 1000); // In milliseconds. Set this to 2000 later
     }
 
     public void stopPolling() {

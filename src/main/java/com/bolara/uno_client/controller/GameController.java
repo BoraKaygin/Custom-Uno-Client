@@ -4,6 +4,8 @@ import com.bolara.uno_client.StageManager;
 import com.bolara.uno_client.config.Constants;
 import com.bolara.uno_client.dto.Game;
 import com.bolara.uno_client.dto.Hand;
+import com.bolara.uno_client.game.GameManager;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.ChoiceDialog;
@@ -13,35 +15,60 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import com.bolara.uno_client.dto.Game;
 import com.bolara.uno_client.dto.Card;
 import com.bolara.uno_client.dto.Card.Type;
 import javafx.scene.control.Label;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class GameController {
 
-    @FXML private HBox topHand;
-    @FXML private VBox leftHand;
-    @FXML private VBox rightHand;
-    @FXML private HBox playerHand;
+    @FXML
+    private HBox topHand;
+    @FXML
+    private VBox leftHand;
+    @FXML
+    private VBox rightHand;
+    @FXML
+    private HBox playerHand;
 
-    @FXML private ImageView directionArrow;
-    @FXML private ImageView topCardImage;
-    @FXML private ImageView deckImage;
+    @FXML
+    private ImageView directionArrow;
+    @FXML
+    private ImageView topCardImage;
+    @FXML
+    private ImageView deckImage;
 
-    @FXML private Label playerUnoLabel;
-    @FXML private Label topUnoLabel;
-    @FXML private Label leftUnoLabel;
-    @FXML private Label rightUnoLabel;
+    @FXML
+    private Label playerUnoLabel;
+    @FXML
+    private Label topUnoLabel;
+    @FXML
+    private Label leftUnoLabel;
+    @FXML
+    private Label rightUnoLabel;
 
-    @FXML private Label playerNameLabel;
-    @FXML private Label topNameLabel;
-    @FXML private Label leftNameLabel;
-    @FXML private Label rightNameLabel;
+    @FXML
+    private Label playerNameLabel;
+    @FXML
+    private Label topNameLabel;
+    @FXML
+    private Label leftNameLabel;
+    @FXML
+    private Label rightNameLabel;
+
+    @FXML
+    private javafx.scene.shape.Rectangle currentColorBox;
+
+    private GameManager gameManager;
+
+    private final int PLAYER_INDEX = 0;
+
+    private boolean promptUp = false;
 
     @FXML
     public void initialize() {
@@ -51,67 +78,83 @@ public class GameController {
         directionArrow.setImage(arrowImg);
         deckImage.setImage(deck);
 
-        // Create dummy discard pile with some cards
-        List<Card> discardPile = List.of(
-                new Card(Card.Color.GREEN, Type.SKIP, -1),
-                new Card(Card.Color.RED, Type.NUMBER, 6),
-                new Card(Card.Color.BLUE, Type.NUMBER, 5) // top card
-        );
+        gameManager = GameManager.getInstance();
+        gameManager.createSinglePlayerGame();
+        gameManager.startPolling(this::onUpdate);
+        Game game = gameManager.getGame();
 
-        // Create dummy hands (player, top, left, right)
-        Hand player = new Hand("you", List.of(), true);
-        Hand cpu1 = new Hand("bot1", List.of(), true);
-        Hand cpu2 = new Hand("bot2", List.of(), true);
-        Hand cpu3 = new Hand("bot3", List.of(), true);
+        Hand player = game.players().get(0);
+        for (int i = 0; i < player.cards().size(); i++) {
+            playerHand.getChildren().add(createColoredCard(player.cards().get(i), true));
+        }
+        Hand top = game.players().get(2);
+        for (int i = 0; i < top.cards().size(); i++) {
+            topHand.getChildren().add(createColoredCard(top.cards().get(i), false));
+        }
+        Hand left = game.players().get(1);
+        for (int i = 0; i < left.cards().size(); i++) {
+            leftHand.getChildren().add(createColoredCard(left.cards().get(i), false));
+        }
+        Hand right = game.players().get(3);
+        for (int i = 0; i < right.cards().size(); i++) {
+            rightHand.getChildren().add(createColoredCard(right.cards().get(i), false));
+        }
 
-        List<Hand> dummyHands = List.of(player, cpu1, cpu2, cpu3);
-
-        // Create a dummy game object to simulate testing
-        Game game = new Game(
-                dummyHands, // players
-                List.of(), // draw pile
-                discardPile, // discard pile
-                3,         // current turn
-                -1,         // or -1 for testing
-                Game.GameState.IN_PROGRESS,
-                0,   // draw two stack
-                null       // winner
-        );
 
         updateDirectionArrow(game.direction());
-
-        for (int i = 0; i < 7; i++) {
-            playerHand.getChildren().add(createColoredCard(randomCard(), true));
-            topHand.getChildren().add(createColoredCard(randomCard(), false));
-            leftHand.getChildren().add(createColoredCard(randomCard(), false));
-            rightHand.getChildren().add(createColoredCard(randomCard(), false));
-
-        }
         showTopCard(game);
         updateUnoIndicators(game.players());
         highlightCurrentTurn(game.currentTurn());
 
     }
 
+    private void onUpdate(Game game) {
+        if (game.topCardisWild() && !promptUp) {
+            promptUp = true;
+            Card topCard = game.discardPile().getLast();
+            topCard = promptColorSelection(topCard);
+            gameManager.setTopCardColor(topCard.color());
+        }
+        if (!game.topCardisWild()) {
+            promptUp = false;
+        }
+        Platform.runLater(() -> {
+            updateDirectionArrow(game.direction());
+            showTopCard(game);
+            updateUnoIndicators(game.players());
+            highlightCurrentTurn(game.currentTurn());
+
+            // Clear existing cards
+            playerHand.getChildren().clear();
+            topHand.getChildren().clear();
+            leftHand.getChildren().clear();
+            rightHand.getChildren().clear();
+
+            // Add updated cards
+            Hand player = game.players().get(0);
+            for (Card card : player.cards()) {
+                playerHand.getChildren().add(createColoredCard(card, true));
+            }
+
+            Hand top = game.players().get(2);
+            for (Card card : top.cards()) {
+                topHand.getChildren().add(createColoredCard(card, false));
+            }
+
+            Hand left = game.players().get(1);
+            for (Card card : left.cards()) {
+                leftHand.getChildren().add(createColoredCard(card, false));
+            }
+
+            Hand right = game.players().get(3);
+            for (Card card : right.cards()) {
+                rightHand.getChildren().add(createColoredCard(card, false));
+            }
+        });
+    }
+
     private static <T> T random(T[] array) {
         return array[new Random().nextInt(array.length)];
-    }
-    private Card randomCard() {
-        Card.Type[] types = {
-                Type.NUMBER, Type.SKIP, Type.REVERSE, Type.DRAW_TWO,
-                Type.WILD_CHANGE_COLOR, Type.WILD_DRAW_FOUR
-        };
-
-        Card.Type type = random(types);
-
-        // Wild cards get special WILD color
-        Card.Color color = (type == Type.WILD_CHANGE_COLOR || type == Type.WILD_DRAW_FOUR)
-                ? Card.Color.WILD
-                : random(new Card.Color[]{Card.Color.RED, Card.Color.BLUE, Card.Color.GREEN, Card.Color.YELLOW});
-
-        int number = (type == Type.NUMBER) ? new Random().nextInt(10) : -1;
-
-        return new Card(color, type, number);
     }
 
     private ImageView createColoredCard(Card card, boolean isPlayerCard) {
@@ -151,80 +194,97 @@ public class GameController {
             view.setOnMouseClicked(e -> {
                 Card clickedCard = (Card) view.getUserData();
                 System.out.println("Card clicked: " + clickedCard);
+                int index = getCardIndex(clickedCard);
+                System.out.println("Card index: " + index);
 
-                if (clickedCard.type() == Card.Type.WILD_CHANGE_COLOR) {
-                    promptColorSelection(clickedCard);
+                if (clickedCard.color() == Card.Color.WILD) {
+                    clickedCard = promptColorSelection(clickedCard);
                 }
-
+                gameManager.playCard(PLAYER_INDEX, index, clickedCard.color());
             });
         }
 
         return view;
     }
 
+    public int getCardIndex(Card card) {
+        for (int i = 0; i < playerHand.getChildren().size(); i++) {
+            ImageView view = (ImageView) playerHand.getChildren().get(i);
+            if (view.getUserData().equals(card)) {
+                return i;
+            }
+        }
+        return -1; // Not found
+    }
+
     @FXML  // here, instead of red, put the game's current color (top card of the discard pile)
     private void handleCheatSkip() {
-        Card cheatCard = new Card(Card.Color.RED, Type.SKIP, -1);
-        simulateCardClick(cheatCard);
+        Card.Color color = Objects.requireNonNull(gameManager.getGame().getTopCard()).color();
+        Card cheatCard = new Card(color, Type.SKIP, -1);
+        gameManager.playCheatCard(PLAYER_INDEX, cheatCard);
     }
 
 
     @FXML  // here, instead of red, put the game's current color (top card of the discard pile)
     private void handleCheatReverse() {
-        Card cheatCard = new Card(Card.Color.RED, Type.REVERSE, -1);
-        simulateCardClick(cheatCard);
+        Card.Color color = Objects.requireNonNull(gameManager.getGame().getTopCard()).color();
+        Card cheatCard = new Card(color, Type.REVERSE, -1);
+        gameManager.playCheatCard(PLAYER_INDEX, cheatCard);
     }
 
     @FXML  // here, instead of red, put the game's current color (top card of the discard pile)
     private void handleCheatDrawTwo() {
-        Card cheatCard = new Card(Card.Color.RED, Type.DRAW_TWO, -1);
-        simulateCardClick(cheatCard);
+        Card.Color color = Objects.requireNonNull(gameManager.getGame().getTopCard()).color();
+        Card cheatCard = new Card(color, Type.DRAW_TWO, -1);
+        gameManager.playCheatCard(PLAYER_INDEX, cheatCard);
     }
 
     @FXML  // here, instead of red, put the game's current color (top card of the discard pile)
     private void handleCheatWild() {
+        ;
         Card cheatCard = new Card(Card.Color.WILD, Type.WILD_CHANGE_COLOR, -1);
-        simulateCardClick(cheatCard);
+        cheatCard = promptColorSelection(cheatCard);
+        gameManager.playCheatCard(PLAYER_INDEX, cheatCard);
     }
 
     @FXML
     private void handleCheatWildDrawFour() {
         Card cheatCard = new Card(Card.Color.WILD, Type.WILD_DRAW_FOUR, -1);
-        simulateCardClick(cheatCard);
+        cheatCard = promptColorSelection(cheatCard);
+        gameManager.playCheatCard(PLAYER_INDEX, cheatCard);
     }
 
-    private void simulateCardClick(Card card) {
-        System.out.println("Cheat played: " + card);
+//    private void simulateCardClick(Card card) {
+//        System.out.println("Cheat played: " + card);
+//
+//        if (card.color() == Card.Color.WILD) {
+//            promptColorSelection(card);
+//        } else {
+//            // Simulate playing the card directly
+//            System.out.println("Simulated play of: " + card);
+//        }
+//    }
 
-        if (card.color() == Card.Color.WILD && card.type() == Type.WILD_CHANGE_COLOR) {
-            promptColorSelection(card);
-        } else {
-            // Simulate playing the card directly
-            System.out.println("Simulated play of: " + card);
-        }
-    }
-
-    private void promptColorSelection(Card clickedCard) {
-        List<String> choices = List.of("RED", "BLUE", "GREEN", "YELLOW");
-
-        ChoiceDialog<String> dialog = new ChoiceDialog<>("RED", choices);
+    private Card promptColorSelection(Card clickedCard) {
+        List<Card.Color> choices = List.of(Card.Color.RED, Card.Color.BLUE, Card.Color.GREEN, Card.Color.YELLOW);
+        ChoiceDialog<Card.Color> dialog = new ChoiceDialog<>(Card.Color.RED, choices);
         dialog.setTitle("Choose a Color");
         dialog.setHeaderText("You played a Wild card.");
         dialog.setContentText("Pick a color:");
+        AtomicReference<Card> result = new AtomicReference<>();
 
         dialog.showAndWait().ifPresent(color -> {
             System.out.println("You selected: " + color);
-
-            // TODO: Now proceed with updating game state and sending move to backend (if ready)
-            // For now, just simulate card color assignment:
-            Card.Color chosenColor = Card.Color.valueOf(color);
-            System.out.println("Card played with chosen color: " + chosenColor);
+            result.set(new Card(color, clickedCard.type(), -1));
+            System.out.println("Card played with chosen color: " + color);
         });
+        return result.get();
     }
 
     @FXML
     private void handleDrawCard() {
         System.out.println("Deck clicked!");
+        gameManager.drawCard(PLAYER_INDEX);
     }
 
     private void highlightCurrentTurn(int currentTurn) {
@@ -261,10 +321,6 @@ public class GameController {
         rightUnoLabel.setVisible(hands.get(3).calledUno());
     }
 
-    private String random(String[] array) {
-        return array[(int) (Math.random() * array.length)];
-    }
-
     private void showTopCard(Game game) {
         if (game.discardPile().isEmpty()) return;
 
@@ -275,8 +331,8 @@ public class GameController {
             case SKIP -> "_skip.png";
             case REVERSE -> "_reverse.png";
             case DRAW_TWO -> "_draw2.png";
-            case WILD_CHANGE_COLOR -> "wild.png";
-            case WILD_DRAW_FOUR -> "wild_draw.png";
+            case WILD_CHANGE_COLOR -> "_wild.png";
+            case WILD_DRAW_FOUR -> "_wild_draw.png";
         };
 
         String baseImage = switch (topCard.color()) {
@@ -299,8 +355,18 @@ public class GameController {
         if (combined == null) {
             System.err.println("⚠️ Failed to combine top card image");
         }
-        System.out.println("Top card image set: " + combined.getWidth() + "x" + combined.getHeight());
+        //System.out.println("Top card image set: " + combined.getWidth() + "x" + combined.getHeight());
         topCardImage.setImage(combined);
+
+        // Set color box fill
+        Color fxColor = switch (topCard.color()) {
+            case RED -> Color.RED;
+            case BLUE -> Color.DODGERBLUE;
+            case GREEN -> Color.GREEN;
+            case YELLOW -> Color.GOLD;
+            case WILD -> Color.GRAY;
+        };
+        currentColorBox.setFill(fxColor);
     }
 
     private Image combineCardLayers(String valueImage, String baseImage) {
@@ -327,6 +393,80 @@ public class GameController {
 
     @FXML
     private void handleBackToMenu() {
+        gameManager.resetInstance();
         StageManager.switchScene(Constants.SCENE_MENU);
     }
 }
+
+/*
+@FXML
+private void handleCardClick(int cardIndex) {
+    int playerIndex = ...; // get this from game state (e.g. your hand is at index 0)
+    String declaredColor = null;
+
+    // Only declare color for wild cards
+    Card selected = hand.cards().get(cardIndex);
+    if (selected.type() == Card.Type.WILD_CHANGE_COLOR || selected.type() == Card.Type.WILD_DRAW_FOUR) {
+        // You can show a dialog or hardcode for testing
+        declaredColor = "RED"; // or use a color picker
+    }
+
+    boolean success = gameManager.playCard(playerIndex, cardIndex, declaredColor);
+    if (!success) {
+        // show message to user
+        System.err.println("Invalid move.");
+    }
+}
+
+@FXML
+private void handleDrawCard() {
+    int playerIndex = getYourPlayerIndex(); // this depends on your logic
+
+    boolean success = gameManager.drawCard(playerIndex);
+    if (!success) {
+        System.err.println("Failed to draw card. Maybe you still have playable cards.");
+    }
+}
+
+@FXML
+private void handleExitGame() {
+    boolean success = gameManager.removeGame();
+    if (success) {
+        System.out.println("Returned to main menu.");
+        // TODO: Navigate to main menu scene
+    } else {
+        System.err.println("Failed to remove game.");
+    }
+}
+
+{
+            System.out.println("\n========== GAME STATE ==========");
+
+            System.out.println("State         : " + game.state());
+            System.out.println("Current Turn  : " + game.players().get(game.currentTurn()).username());
+            System.out.println("Direction     : " + (game.direction() == 1 ? "Clockwise" : "Counter-clockwise"));
+            System.out.println("Draw2 Stack   : " + game.drawTwoStack());
+            System.out.println("Winner        : " + (game.winnerUsername() != null ? game.winnerUsername() : "None"));
+
+            System.out.println("\n--- Player Hands ---");
+            for (int i = 0; i < game.players().size(); i++) {
+                var hand = game.players().get(i);
+                String playerLabel = (i == game.currentTurn() ? "👉 " : "   ") + hand.username();
+                System.out.println(playerLabel + " (" + hand.cards().size() + " cards):");
+
+                for (Card c : hand.cards()) {
+                    System.out.printf("   - %-6s %-20s %s\n", c.color(), c.type(), (c.number() >= 0 ? c.number() : ""));
+                }
+
+                System.out.println();
+            }
+
+            System.out.println("--- Top Discard Card ---");
+            if (!game.discardPile().isEmpty()) {
+                Card top = game.discardPile().get(game.discardPile().size() - 1);
+                System.out.printf("Color: %-6s Type: %-20s Number: %s\n", top.color(), top.type(), top.number() >= 0 ? top.number() : "");
+            }
+
+            System.out.println("========== END STATE ==========\n");
+        }
+*/

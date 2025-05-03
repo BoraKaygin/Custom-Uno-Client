@@ -102,7 +102,7 @@ public class NetworkController {
         }
     }
 
-    public static boolean playCard(String gameId, int playerIndex, int cardIndex, String declaredColor) {
+    public static boolean playCard(String gameId, int playerIndex, int cardIndex, Card.Color declaredColor) {
         try {
             StringBuilder uri = new StringBuilder(Constants.URL_GAME)
                     .append("/").append(gameId)
@@ -139,63 +139,92 @@ public class NetworkController {
     }
 
     public static boolean playCheatCard(String gameId, int playerIndex, Card card) {
-    try {
-        PlayCheatCardRequest requestObj = new PlayCheatCardRequest(playerIndex, card);
-        String requestBody = mapper.writeValueAsString(requestObj);
+        try {
+            PlayCheatCardRequest requestObj = new PlayCheatCardRequest(playerIndex, card);
+            String requestBody = mapper.writeValueAsString(requestObj);
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(Constants.URL_GAME + "/" + gameId + "/cheat"))
-                .header("Content-Type", Constants.CT_APP_JSON)
-                .header("Cookie", SessionManager.getSessionCookie())
-                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
-                .build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(Constants.URL_GAME + "/" + gameId + "/cheat"))
+                    .header("Content-Type", Constants.CT_APP_JSON)
+                    .header("Cookie", SessionManager.getSessionCookie())
+                    .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                    .build();
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        if (response.statusCode() == 200) {
-            System.out.println("Cheat card played successfully.");
-            return true;
-        } else {
-            System.err.println("Failed to play cheat card.");
-            System.err.println("Status: " + response.statusCode());
-            System.err.println("Response: " + response.body());
+            if (response.statusCode() == 200) {
+                System.out.println("Cheat card played successfully.");
+                return true;
+            } else {
+                System.err.println("Failed to play cheat card.");
+                System.err.println("Status: " + response.statusCode());
+                System.err.println("Response: " + response.body());
+                return false;
+            }
+
+        } catch (Exception e) {
+            System.err.println("Exception during playCheatCard: " + e.getMessage());
+            e.printStackTrace();
             return false;
         }
-
-    } catch (Exception e) {
-        System.err.println("Exception during playCheatCard: " + e.getMessage());
-        e.printStackTrace();
-        return false;
     }
-}
+
+    public static boolean setTopCardColor(String gameId, Card.Color declaredColor) {
+        try {
+            StringBuilder uri = new StringBuilder(Constants.URL_GAME)
+                    .append("/").append(gameId)
+                    .append("/set-top-color")
+                    .append("?declaredColor=").append(declaredColor);
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(uri.toString()))
+                    .POST(HttpRequest.BodyPublishers.noBody())
+                    .header("Content-Type", "application/json")
+                    .build();
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                System.out.println("Top card color set successfully.");
+                return true;
+            } else {
+                System.err.println("Failed to set top card color.");
+                System.err.println("Status: " + response.statusCode());
+                System.err.println("Body: " + response.body());
+                return false;
+            }
+        } catch (Exception e) {
+            System.err.println("Exception while setting top card color: " + e.getMessage());
+            return false;
+        }
+    }
 
 
     public static boolean drawCard(String gameId, int playerIndex) {
-    try {
-        String uri = Constants.URL_GAME + "/" + gameId + "/draw?playerIndex=" + playerIndex;
+        try {
+            String uri = Constants.URL_GAME + "/" + gameId + "/draw?playerIndex=" + playerIndex;
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(uri))
-                .header("Cookie", SessionManager.getSessionCookie())
-                .POST(HttpRequest.BodyPublishers.noBody())
-                .build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(uri))
+                    .header("Cookie", SessionManager.getSessionCookie())
+                    .POST(HttpRequest.BodyPublishers.noBody())
+                    .build();
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        if (response.statusCode() == 200) {
-            System.out.println("Card drawn successfully.");
-            return true;
-        } else {
-            System.err.println("Failed to draw card.");
-            System.err.println("Status: " + response.statusCode());
-            System.err.println("Response: " + response.body());
+            if (response.statusCode() == 200) {
+                System.out.println("Card drawn successfully.");
+                return true;
+            } else {
+                System.err.println("Failed to draw card.");
+                System.err.println("Status: " + response.statusCode());
+                System.err.println("Response: " + response.body());
+                return false;
+            }
+
+        } catch (Exception e) {
+            System.err.println("Exception while drawing card: " + e.getMessage());
+            e.printStackTrace();
             return false;
         }
-
-    } catch (Exception e) {
-        System.err.println("Exception while drawing card: " + e.getMessage());
-        e.printStackTrace();
-        return false;
     }
-}
 
 
     public static boolean addComputerPlayer(String gameId) {
@@ -249,31 +278,31 @@ public class NetworkController {
     }
 
     public static boolean removeGame(String gameId) {
-    try {
-        String uri = Constants.URL_GAME + "/" + gameId;
+        try {
+            String uri = Constants.URL_GAME + "/" + gameId;
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(uri))
-                .header("Cookie", SessionManager.getSessionCookie())
-                .DELETE()
-                .build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(uri))
+                    .header("Cookie", SessionManager.getSessionCookie())
+                    .DELETE()
+                    .build();
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        if (response.statusCode() == 200) {
-            System.out.println("Game removed successfully.");
-            return true;
-        } else {
-            System.err.println("Failed to remove game.");
-            System.err.println("Status: " + response.statusCode());
-            System.err.println("Response: " + response.body());
+            if (response.statusCode() == 200) {
+                System.out.println("Game removed successfully.");
+                return true;
+            } else {
+                System.err.println("Failed to remove game.");
+                System.err.println("Status: " + response.statusCode());
+                System.err.println("Response: " + response.body());
+                return false;
+            }
+
+        } catch (Exception e) {
+            System.err.println("Exception while removing game: " + e.getMessage());
+            e.printStackTrace();
             return false;
         }
-
-    } catch (Exception e) {
-        System.err.println("Exception while removing game: " + e.getMessage());
-        e.printStackTrace();
-        return false;
     }
-}
 
 }
