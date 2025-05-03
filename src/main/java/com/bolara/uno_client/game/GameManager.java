@@ -1,11 +1,19 @@
 package com.bolara.uno_client.game;
 
 import com.bolara.uno_client.controller.NetworkController;
+import com.bolara.uno_client.dto.Card;
+import com.bolara.uno_client.dto.Game;
+
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.function.Consumer;
 
 public class GameManager {
     private static GameManager instance = null;
-    boolean gameStarted = false;
-    boolean gameEnded = false;
+    private String gameId;
+    private Game game;
+    private Timer pollingTimer;
+
 
     private GameManager() {
         // Private constructor to prevent instantiation
@@ -18,15 +26,17 @@ public class GameManager {
         return instance;
     }
 
-    private String gameId;
+    public static void resetInstance() {
+        instance = null;
+    }
 
     public void createSinglePlayerGame() {
         gameId = createGame();
-        joinGame(gameId);
+        assert joinGame(gameId);
         for (int i = 0; i < 3; i++) {
             addComputerPlayer();
         }
-        gameStarted = startGame();
+        assert startGame();
     }
 
     private String createGame() {
@@ -38,11 +48,12 @@ public class GameManager {
         return gameId;
     }
 
-    private void joinGame(String gameId) {
+    private boolean joinGame(String gameId) {
         boolean joined = NetworkController.joinGame(gameId);
         if (!joined) {
             System.err.println("Failed to join game.");
         }
+        return joined;
     }
 
     private boolean startGame() {
@@ -58,6 +69,42 @@ public class GameManager {
         return true;
     }
 
+    public boolean playCard(int playerIndex, int cardIndex, String declaredColor) {
+        if (gameId == null) {
+            System.err.println("Game ID is null. Cannot play card.");
+            return false;
+        }
+        boolean played = NetworkController.playCard(gameId, playerIndex, cardIndex, declaredColor);
+        if (!played) {
+            System.err.println("Failed to play card.");
+        }
+        return played;
+    }
+
+    public boolean playCheatCard(int playerIndex, Card card) {
+        if (gameId == null) {
+            System.err.println("Game ID is null. Cannot play cheat card.");
+            return false;
+        }
+        boolean played = NetworkController.playCheatCard(gameId, playerIndex, card);
+        if (!played) {
+            System.err.println("Failed to play cheat card.");
+        }
+        return played;
+    }
+
+    public boolean drawCard(int playerIndex) {
+        if (gameId == null) {
+            System.err.println("Game ID is null. Cannot draw card.");
+            return false;
+        }
+        boolean drawn = NetworkController.drawCard(gameId, playerIndex);
+        if (!drawn) {
+            System.err.println("Failed to draw card.");
+        }
+        return drawn;
+    }
+
     private void addComputerPlayer() {
         if (gameId == null) {
             System.err.println("Game ID is null. Cannot add computer player.");
@@ -67,5 +114,61 @@ public class GameManager {
         if (!added) {
             System.err.println("Failed to add computer player.");
         }
+    }
+
+    private Game getGame() {
+        if (gameId == null) {
+            System.err.println("Game ID is null. Cannot get game.");
+            return null;
+        }
+        game = NetworkController.getGame(gameId);
+        if (game == null) {
+            System.err.println("Failed to get game.");
+            return null;
+        }
+        return game;
+    }
+
+    public void startPolling(Consumer<Game> onUpdate) {
+        if (gameId == null) {
+            System.err.println("Game ID is null. Cannot start polling.");
+            return;
+        }
+
+        if (pollingTimer != null) {
+            pollingTimer.cancel();
+        }
+
+        pollingTimer = new Timer(true);
+
+        pollingTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                Game fetchedGame = getGame();
+                if (fetchedGame != null) {
+                    game = fetchedGame;
+                    onUpdate.accept(fetchedGame);
+                }
+            }
+        }, 0, 200000); // In milliseconds. Set this to 2000 later
+    }
+
+    public void stopPolling() {
+        if (pollingTimer != null) {
+            pollingTimer.cancel();
+            pollingTimer = null;
+        }
+    }
+
+    public boolean removeGame() {
+        if (gameId == null) {
+            System.err.println("Game ID is null. Cannot remove game.");
+            return false;
+        }
+        boolean removed = NetworkController.removeGame(gameId);
+        if (!removed) {
+            System.err.println("Failed to remove game.");
+        }
+        return removed;
     }
 }

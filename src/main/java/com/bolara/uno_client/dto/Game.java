@@ -1,7 +1,10 @@
 package com.bolara.uno_client.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public record Game(
         List<Hand> players,
         List<Card> drawPile,
@@ -24,6 +27,8 @@ public record Game(
         }
         return discardPile.getLast();
     }
+
+    public boolean topCardisWild() {
+        return getTopCard() != null && getTopCard().color() == Card.Color.WILD;
+    }
 }
-
-
