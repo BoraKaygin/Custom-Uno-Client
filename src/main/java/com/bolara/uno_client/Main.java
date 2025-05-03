@@ -15,6 +15,14 @@ public class Main extends Application {
         StageManager.stage = primaryStage;
         primaryStage.setTitle("UNO Game");
 
+        // Set minimum size
+        primaryStage.setMinWidth(700);
+        primaryStage.setMinHeight(700);
+
+        primaryStage.setWidth(Constants.WindowWidth);
+        primaryStage.setHeight(Constants.WindowHeight);
+        primaryStage.centerOnScreen();
+
         StageManager.switchScene(Constants.SCENE_LOGIN);
         primaryStage.show();
     }

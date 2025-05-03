@@ -2,38 +2,78 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.bolara.uno_client.controller.GameController">
+<?import javafx.scene.image.ImageView?>
 
-    <!-- Top: Back button + top hand -->
-    <top>
-        <VBox spacing="10">
-            <HBox>
-                <Button text="Back to Menu"
+<StackPane xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.bolara.uno_client.controller.GameController">
+    <Region fx:id="backgroundRegion" styleClass="background-image"/>
+
+    <BorderPane id="gameLayout">
+
+        <!-- Top: Back button + top hand -->
+        <top>
+            <VBox spacing="10">
+                <HBox>
+                    <Button text="Back to Menu"
                         onAction="#handleBackToMenu"
-                        styleClass="button-type3"
+                        styleClass="button-game"
                         maxWidth="150" />
+                </HBox>
+                <VBox alignment="CENTER" spacing="20" styleClass="border">
+                    <Label  fx:id="topNameLabel" text="Computer 2" styleClass="player-name"/>
+                    <HBox fx:id="topHand" spacing="1" alignment="CENTER" styleClass="cpu-top"/>
+                    <Label fx:id="topUnoLabel" text="UNO!" visible="false" styleClass="uno-label"/>
+                </VBox>
+            </VBox>
+        </top>
+
+        <bottom>
+            <VBox alignment="CENTER" spacing="20" styleClass="border">
+                <Label fx:id="playerUnoLabel" text="UNO!" visible="false" styleClass="uno-label"/>
+                <HBox fx:id="playerHand" spacing="1" alignment="CENTER" styleClass="player-hand" />
+                <Label fx:id="playerNameLabel" text="You" styleClass="player-name"/>
+                <HBox alignment="CENTER" spacing="5">
+                    <Button text="Skip" onAction="#handleCheatSkip" styleClass="button-game" />
+                    <Button text="Reverse" onAction="#handleCheatReverse" styleClass="button-game" />
+                    <Button text="Draw Two" onAction="#handleCheatDrawTwo" styleClass="button-game" />
+                    <Button text="Wild" onAction="#handleCheatWild" styleClass="button-game" />
+                    <Button text="Wild Draw Four" onAction="#handleCheatWildDrawFour" styleClass="button-game" />
+                </HBox>
+                <!-- Spacer to add gap below -->
+                <Region minHeight="10" />
+            </VBox>
+
+        </bottom>
+
+        <left>
+            <HBox alignment="CENTER" spacing="20" styleClass="border">
+                <Label fx:id="leftNameLabel" text="Computer 1"  styleClass="player-name"/>
+                <VBox fx:id="leftHand" spacing="-20" alignment="CENTER" styleClass="cpu-left" />
+                <Label fx:id="leftUnoLabel" text="UNO!" visible="false" styleClass="uno-label"/>
             </HBox>
-            <HBox fx:id="topHand" spacing="10" alignment="CENTER" styleClass="cpu-top"/>
-        </VBox>
-    </top>
+        </left>
 
-    <bottom>
-        <HBox fx:id="playerHand" spacing="10" alignment="CENTER" styleClass="player-hand" />
-    </bottom>
+        <right>
+            <HBox alignment="CENTER" spacing="20" styleClass="border">
+                <Label fx:id="rightUnoLabel" text="UNO!" visible="false" styleClass="uno-label"/>
+                <VBox fx:id="rightHand" spacing="-20" alignment="CENTER" styleClass="cpu-right"/>
+                <Label fx:id="rightNameLabel" text="Computer 3" styleClass="player-name"/>
+            </HBox>
+        </right>
 
-    <left>
-        <VBox fx:id="leftHand" spacing="10" alignment="CENTER" styleClass="cpu-left" />
-    </left>
+        <center>
+            <VBox alignment="CENTER" spacing="20" styleClass="border">
+                <ImageView fx:id="directionArrow" fitWidth="80" preserveRatio="true"/>
+                <!-- Show deck and top card side-by-side -->
+                <HBox alignment="CENTER" spacing="40">
+                    <ImageView fx:id="deckImage" onMouseClicked="#handleDrawCard" styleClass="image-view-clickable" fitWidth="100" preserveRatio="true"/>
+                    <ImageView fx:id="topCardImage" fitHeight="110" preserveRatio="true"/>
+                </HBox>
 
-    <right>
-        <VBox fx:id="rightHand" spacing="10" alignment="CENTER" styleClass="cpu-right"/>
-    </right>
+            </VBox>
+        </center>
 
-    <center>
-        <Label text="UNO GAME" style="-fx-font-size: 24px;"/>
-    </center>
-</BorderPane>
-
+    </BorderPane>
+</StackPane>
 

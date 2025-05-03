@@ -3,23 +3,25 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.bolara.uno_client.controller.LoginController"
-      spacing="15" alignment="CENTER">
-    <Label text="Login" style="-fx-font-size: 20px;"/>
 
-    <TextField fx:id="usernameField" promptText="Username" />
-    <PasswordField fx:id="passwordField" promptText="Password" />
+<StackPane xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.bolara.uno_client.controller.LoginController"
+           stylesheets="@/css/styles.css"
+           styleClass="login-and-menu-background">
+    <VBox spacing="15" alignment="CENTER">
+        <Label text="Login" style="-fx-font-size: 20px;"/>
 
-    <Button text="Login" styleClass="button-type1" onAction="#handleLogin"/>
-    <Button text="Register" styleClass="button-type1" onAction="#openRegister"/>
+        <TextField fx:id="usernameField" promptText="Username" />
+        <PasswordField fx:id="passwordField" promptText="Password" />
 
-    <Label fx:id="statusLabel" textFill="#2b2736"/>
+        <Button text="Login" styleClass="button-type1" onAction="#handleLogin"/>
+        <Button text="Register" styleClass="button-type1" onAction="#openRegister"/>
 
-    <Label text="Did you forget your password? No problem!" style="-fx-font-size: 16px;"/>
-    <Button text="Password Reminder" styleClass="button-type2" onAction="#openReminder"/>
-    <Button text="Reset Password" styleClass="button-type2"  onAction="#openPasswordReset" />
+        <Label fx:id="statusLabel" textFill="#2b2736"/>
 
-
-
-</VBox>
+        <Label text="Did you forget your password? No problem!" style="-fx-font-size: 16px;"/>
+        <Button text="Password Reminder" styleClass="button-type2" onAction="#openReminder"/>
+        <Button text="Reset Password" styleClass="button-type2"  onAction="#openPasswordReset" />
+    </VBox>
+</StackPane>

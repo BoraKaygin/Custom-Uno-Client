@@ -19,7 +19,7 @@ public class StageManager {
         try {
             loader = new FXMLLoader(StageManager.class.getResource(fxmlPath));
             root = loader.load();
-            scene = new Scene(root, Constants.WindowWidth, Constants.WindowHeight);
+            scene = new Scene(root); //, Constants.WindowWidth, Constants.WindowHeight);
             scene.getStylesheets().add(StageManager.class.getResource("/css/styles.css").toExternalForm());
             stage.setScene(scene);
         } catch (IOException e) {

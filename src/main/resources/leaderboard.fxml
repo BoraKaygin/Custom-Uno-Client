@@ -3,24 +3,27 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox xmlns:fx="http://javafx.com/fxml"
-      xmlns="http://javafx.com/javafx"
-      fx:controller="com.bolara.uno_client.controller.LeaderboardController"
-      spacing="15" alignment="CENTER" prefWidth="600" prefHeight="500">
+<StackPane xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.bolara.uno_client.controller.LeaderboardController"
+           stylesheets="@/css/styles.css"
+           styleClass="login-and-menu-background">
+    <VBox spacing="15" alignment="CENTER" prefWidth="600" prefHeight="500">
 
-    <Label text="Leaderboard" style="-fx-font-size: 24px;" />
+        <Label text="Leaderboard" style="-fx-font-size: 24px;" />
 
-    <ComboBox fx:id="timeRangeBox" onAction="#handleTimeRangeChange" promptText="Select Time Range" maxWidth="200" />
+        <ComboBox fx:id="timeRangeBox" onAction="#handleTimeRangeChange" promptText="Select Time Range" maxWidth="200" />
 
-    <TableView fx:id="leaderboardTable" styleClass="leaderboard-table">
-        <columns>
-            <TableColumn fx:id="rankColumn" text="#" prefWidth="40" />
-            <TableColumn fx:id="usernameColumn" text="Username" prefWidth="160" />
-            <TableColumn fx:id="scoreColumn" text="Score" prefWidth="80" />
-        </columns>
-    </TableView>
+        <TableView fx:id="leaderboardTable" styleClass="leaderboard-table">
+            <columns>
+                <TableColumn fx:id="rankColumn" text="#" prefWidth="40" />
+                <TableColumn fx:id="usernameColumn" text="Username" prefWidth="160" />
+                <TableColumn fx:id="scoreColumn" text="Score" prefWidth="80" />
+            </columns>
+        </TableView>
 
 
-    <Button text="Back to Menu" styleClass="button-type3" onAction="#handleBack" />
+        <Button text="Back to Menu" styleClass="button-type3" onAction="#handleBack" />
 
-</VBox>
+    </VBox>
+</StackPane>

@@ -26,15 +26,48 @@
 }
 
 
-.hand {
+.border {
     -fx-border-color: red;
-    -fx-border-width: 2;
+    -fx-border-width: 0;
 }
 
 .hand-right {
     -fx-border-color: blue;
     -fx-border-width: 2;
 }
+
+ImageView {
+    -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.3), 5, 0, 2, 2);
+}
+
+.image-view-clickable {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 3, 0.3, 0, 0);
+    -fx-cursor: hand;
+}
+
+.background-image {
+    -fx-background-image: url("/assets/background.jpg");
+    -fx-background-size: cover;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center center;
+}
+
+.login-and-menu-background {
+    -fx-background-image: url("/assets/background_login.jpg");
+    -fx-background-size: cover;
+    -fx-background-position: center center;
+}
+
+
+
+.button-game {
+    -fx-background-color: #ffdddd;
+    -fx-text-fill: #990000;
+    -fx-font-weight: bold;
+}
+
+
+
 
 /* Stylish text fields */
 .text-field, .password-field {
@@ -53,6 +86,33 @@
     -fx-text-fill: #444;
     -fx-font-size: 13px;
 }
+
+.uno-label {
+    -fx-font-size: 20px;
+    -fx-text-fill: red;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, black, 2, 0, 1, 1);
+}
+
+.player-name {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333;
+    -fx-padding: 4 10 4 10;
+}
+
+.highlight-turn {
+    -fx-background-color: gold;
+    -fx-text-fill: black;
+    -fx-font-weight: bold;
+    -fx-padding: 4 10 4 10;
+    -fx-border-color: orange;
+    -fx-border-width: 2;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-effect: dropshadow(gaussian, black, 5, 0.5, 0, 0);
+}
+
 
 .leaderboard-table {
     -fx-max-width: 500;
