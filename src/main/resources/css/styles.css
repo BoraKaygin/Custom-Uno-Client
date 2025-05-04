@@ -126,3 +126,47 @@ ImageView {
 }
 
 
+
+/* Apply to all alerts */
+.dialog-pane {
+    -fx-background-color: #fefefe;
+    -fx-font-family: "Arial";
+    -fx-font-size: 14px;
+}
+/* === GLOBAL DIALOG STYLE === */
+.dialog-pane {
+    -fx-background-color: #fefefe;
+    -fx-font-family: "Arial";
+    -fx-font-size: 14px;
+}
+
+/* === HEADER SECTION === */
+.dialog-pane .header-panel {
+    -fx-background-color: #f6e266;
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+}
+
+/* === CONTENT TEXT === */
+.dialog-pane .content {
+    -fx-text-fill: #333;
+}
+
+/* === LABELS INSIDE CONTENT === */
+.dialog-pane .content.label {
+    -fx-text-fill: #333;
+}
+
+/* === BUTTONS IN DIALOGS === */
+.dialog-pane .button-bar .button {
+    -fx-background-color: #f6e266;
+    -fx-text-fill: black;
+    -fx-font-weight: bold;
+}
+
+/* === OPTIONAL: Specific Custom Class for Special Alerts === */
+.dialog-pane.custom-alert {
+    -fx-background-color: linear-gradient(to bottom, #ffffff, #eeeeee);
+    -fx-border-color: #888;
+    -fx-border-width: 2px;
+}

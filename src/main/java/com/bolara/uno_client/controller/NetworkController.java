@@ -179,6 +179,7 @@ public class NetworkController {
                     .uri(URI.create(uri.toString()))
                     .POST(HttpRequest.BodyPublishers.noBody())
                     .header("Content-Type", "application/json")
+                    .header("Cookie", SessionManager.getSessionCookie())
                     .build();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 

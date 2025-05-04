@@ -51,7 +51,7 @@
         <left>
             <HBox alignment="CENTER" spacing="20" styleClass="border">
                 <Label fx:id="leftNameLabel" text="Computer 1"  styleClass="player-name"/>
-                <VBox fx:id="leftHand" spacing="-20" alignment="CENTER" styleClass="cpu-left" />
+                <VBox fx:id="leftHand" spacing="-35" alignment="CENTER" styleClass="cpu-left" />
                 <Label fx:id="leftUnoLabel" text="UNO!" visible="false" styleClass="uno-label"/>
             </HBox>
         </left>
@@ -59,7 +59,7 @@
         <right>
             <HBox alignment="CENTER" spacing="20" styleClass="border">
                 <Label fx:id="rightUnoLabel" text="UNO!" visible="false" styleClass="uno-label"/>
-                <VBox fx:id="rightHand" spacing="-20" alignment="CENTER" styleClass="cpu-right"/>
+                <VBox fx:id="rightHand" spacing="-35" alignment="CENTER" styleClass="cpu-right"/>
                 <Label fx:id="rightNameLabel" text="Computer 3" styleClass="player-name"/>
             </HBox>
         </right>

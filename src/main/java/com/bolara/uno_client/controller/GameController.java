@@ -8,7 +8,9 @@ import com.bolara.uno_client.game.GameManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.SnapshotParameters;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceDialog;
+import javafx.scene.control.DialogPane;
 import javafx.scene.image.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.canvas.Canvas;
@@ -109,16 +111,38 @@ public class GameController {
     }
 
     private void onUpdate(Game game) {
-        if (game.topCardisWild() && !promptUp) {
-            promptUp = true;
-            Card topCard = game.discardPile().getLast();
-            topCard = promptColorSelection(topCard);
-            gameManager.setTopCardColor(topCard.color());
-        }
-        if (!game.topCardisWild()) {
-            promptUp = false;
-        }
         Platform.runLater(() -> {
+            if (game.topCardisWild() && !promptUp) {
+                promptUp = true;
+                Card topCard = game.discardPile().getLast();
+                topCard = promptColorSelection(topCard);
+                gameManager.setTopCardColor(topCard.color());
+            }
+            if (!game.topCardisWild()) {
+                promptUp = false;
+            }
+            if (game.state() == Game.GameState.FINISHED) {
+                gameManager.stopPolling();
+                Platform.runLater(() -> {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Game Over");
+                    alert.setHeaderText("🎉 Game Finished!");
+                    String winner = game.winnerUsername() != null ? game.winnerUsername() : "No one";
+                    alert.setContentText("Winner: " + winner);
+
+                    DialogPane dialogPane = alert.getDialogPane();
+                    dialogPane.getStylesheets().add(getClass().getResource("/css/styles.css").toExternalForm());
+
+                    dialogPane.getStyleClass().add("custom-alert");
+                    alert.showAndWait();
+                    //gameManager.resetInstance(); // it removes the game object, maybe we should save the
+
+                    // Optionally, go back to menu after closing
+                    // StageManager.switchScene(Constants.SCENE_MENU);
+                });
+                return; // Prevent updating hands after game ends
+            }
+
             updateDirectionArrow(game.direction());
             showTopCard(game);
             updateUnoIndicators(game.players());
@@ -150,8 +174,47 @@ public class GameController {
             for (Card card : right.cards()) {
                 rightHand.getChildren().add(createColoredCard(card, false));
             }
+            adjustHorizontalSpacing(playerHand, player.cards());
+            adjustHorizontalSpacing(topHand, top.cards());
+
+            adjustVerticalSpacing(leftHand, left.cards());
+            adjustVerticalSpacing(rightHand, right.cards());
+
         });
     }
+
+    private void adjustHorizontalSpacing(HBox handBox, List<Card> cards) {
+        int cardCount = cards.size();
+        double maxSpacing = 10;
+        double minSpacing = -10;
+
+        double spacing = Math.max(minSpacing, maxSpacing - cardCount);
+        handBox.setSpacing(spacing);
+    }
+    private void adjustVerticalSpacing(VBox handBox, List<Card> cards) {
+        int cardCount = cards.size();
+
+        double spacing;
+        if (cardCount < 8) {
+            // For small hands, more separation (e.g. -25 to -35)
+            spacing = -30;  // e.g. 7 cards → -32
+        } else if (cardCount < 10) {
+            spacing = -38;
+        } else if (cardCount < 15) {
+            // For larger hands, tighter spacing
+            spacing = -48;
+        } else if (cardCount < 17) {
+            spacing = -55;
+        } else {
+            spacing = -56;
+        }
+
+        spacing = Math.max(-60, spacing); // Ensure it doesn’t collapse too tightly
+        handBox.setSpacing(spacing);
+    }
+
+
+
 
     private static <T> T random(T[] array) {
         return array[new Random().nextInt(array.length)];
@@ -273,6 +336,10 @@ public class GameController {
         dialog.setContentText("Pick a color:");
         AtomicReference<Card> result = new AtomicReference<>();
 
+        dialog.getDialogPane().getStylesheets().add(
+                Objects.requireNonNull(getClass().getResource("/css/styles.css")).toExternalForm()
+        );
+
         dialog.showAndWait().ifPresent(color -> {
             System.out.println("You selected: " + color);
             result.set(new Card(color, clickedCard.type(), -1));
@@ -316,8 +383,8 @@ public class GameController {
         if (hands.size() < 4) return; // Safety
 
         playerUnoLabel.setVisible(hands.get(0).calledUno());
-        topUnoLabel.setVisible(hands.get(1).calledUno());
-        leftUnoLabel.setVisible(hands.get(2).calledUno());
+        leftUnoLabel.setVisible(hands.get(1).calledUno());
+        topUnoLabel.setVisible(hands.get(2).calledUno());
         rightUnoLabel.setVisible(hands.get(3).calledUno());
     }
 
