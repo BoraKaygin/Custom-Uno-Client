@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.bolara.uno_client.controller.SetReminderController"
+      spacing="15" alignment="CENTER" styleClass="login-background">
+
+    <Label text="Set Password Reminder" style="-fx-font-size: 20px;" />
+    <TextField fx:id="emailField" promptText="Email" />
+    <TextField fx:id="reminderField" promptText="New Reminder" />
+
+    <Button text="Submit" onAction="#handleSubmit" styleClass="button-type1"/>
+    <Label fx:id="statusLabel" textFill="red" />
+    <Button text="Back to Menu"
+            onAction="#handleBackToMenu"
+            styleClass="button-type3"
+            maxWidth="150" />
+</VBox>

@@ -208,8 +208,6 @@ public class GameController {
         } else {
             spacing = -56;
         }
-
-        spacing = Math.max(-60, spacing); // Ensure it doesn’t collapse too tightly
         handBox.setSpacing(spacing);
     }
 

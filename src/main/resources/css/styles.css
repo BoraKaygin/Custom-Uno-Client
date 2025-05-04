@@ -1,13 +1,10 @@
-/* styles.css */
-
-/* Make buttons modern */
 .button {
     -fx-font-weight: bold;
     -fx-background-radius: 10;
     -fx-padding: 8 20;
     -fx-font-size: 14px;
     -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.4), 4, 0.0, 2, 2);
-    -fx-min-width: 150;
+    -fx-min-width: 175;
 }
 
 .button-type1 {
@@ -22,6 +19,11 @@
 
 .button-type3 {
     -fx-background-color: linear-gradient(to right, #f1db31, #fca033);
+    -fx-text-fill: white;
+}
+
+.button-type4 {
+    -fx-background-color: linear-gradient(to right, #ff9acb, #ff5cdb);
     -fx-text-fill: white;
 }
 
@@ -58,8 +60,6 @@ ImageView {
     -fx-background-position: center center;
 }
 
-
-
 .button-game {
     -fx-background-color: #ffdddd;
     -fx-text-fill: #990000;
@@ -67,9 +67,7 @@ ImageView {
 }
 
 
-
-
-/* Stylish text fields */
+/* text fields */
 .text-field, .password-field {
     -fx-max-width: 300;
     -fx-background-color: #f3f3f3;
@@ -113,7 +111,6 @@ ImageView {
     -fx-effect: dropshadow(gaussian, black, 5, 0.5, 0, 0);
 }
 
-
 .leaderboard-table {
     -fx-max-width: 500;
     -fx-font-size: 14px;
@@ -124,7 +121,6 @@ ImageView {
 .table-view .column-header-background {
     -fx-background-color: #e0e0e0;
 }
-
 
 
 /* Apply to all alerts */
@@ -164,7 +160,7 @@ ImageView {
     -fx-font-weight: bold;
 }
 
-/* === OPTIONAL: Specific Custom Class for Special Alerts === */
+/* === Specific Custom Class for Special Alerts === */
 .dialog-pane.custom-alert {
     -fx-background-color: linear-gradient(to bottom, #ffffff, #eeeeee);
     -fx-border-color: #888;

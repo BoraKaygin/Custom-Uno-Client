@@ -13,6 +13,7 @@
 
         <Button text="Create Game" onAction="#handleCreateGame" styleClass="button-type1" />
         <Button text="Leaderboard" onAction="#handleLeaderboard" styleClass="button-type2" />
+        <Button text="Set Password Reminder" onAction="#openSetReminder" styleClass="button-type4"/>
         <Button text="Logout" onAction="#handleLogout" styleClass="button-type3" />
         <Label fx:id="statusLabel" textFill="#2b2736" style="-fx-font-size: 16px;"/>
 </VBox>

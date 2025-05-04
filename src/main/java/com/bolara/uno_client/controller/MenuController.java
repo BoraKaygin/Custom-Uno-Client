@@ -32,4 +32,10 @@ public class MenuController {
             StageManager.switchScene(Constants.SCENE_LOGIN);
         }
     }
+
+    @FXML
+    private void openSetReminder() {
+        StageManager.switchScene(Constants.SCENE_SET_REMINDER);
+    }
+
 }
