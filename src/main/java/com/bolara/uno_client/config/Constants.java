@@ -28,8 +28,6 @@ public class Constants {
     public static final String SCENE_GAME = "/game.fxml";
     public static final String SCENE_SET_REMINDER = "/set_reminder.fxml";
 
-
-    public static final int WindowWidth = 1000;
     public static final int WindowWidth = 1600;
     public static final int WindowHeight = 900;
 }
