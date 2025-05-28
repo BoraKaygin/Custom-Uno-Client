@@ -11,9 +11,13 @@
 
         <Label text="Welcome to UNO!" style="-fx-font-size: 24px;" />
 
+        <Button text="Create Lobby" onAction="#handleCreateLobby" styleClass="button-type5"/>
+        <Button text="Join Lobby" onAction="#handleJoinLobby" styleClass="button-type5" />
         <Button text="Create Game" onAction="#handleCreateGame" styleClass="button-type1" />
+            <Region prefHeight="10" />
         <Button text="Leaderboard" onAction="#handleLeaderboard" styleClass="button-type2" />
         <Button text="Set Password Reminder" onAction="#openSetReminder" styleClass="button-type4"/>
+            <Region prefHeight="30" />
         <Button text="Logout" onAction="#handleLogout" styleClass="button-type3" />
         <Label fx:id="statusLabel" textFill="#2b2736" style="-fx-font-size: 16px;"/>
 </VBox>

@@ -27,6 +27,11 @@
     -fx-text-fill: white;
 }
 
+.button-type5 {
+    -fx-background-color: linear-gradient(to right, #71e8b5, #02d582);
+    -fx-text-fill: white;
+}
+
 
 .border {
     -fx-border-color: red;

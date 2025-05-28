@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record PlayerGameView(
+public record PlayerGameView (
         Hand playerHand,
         List<PlayerInfo> players,
         Card topCard,
@@ -16,7 +16,7 @@ public record PlayerGameView(
         String winnerUsername
 ) {
 
-    public record PlayerInfo(
+    public record PlayerInfo (
             String username,
             int cardCount,
             boolean hasCalledUno) {

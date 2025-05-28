@@ -1,7 +1,8 @@
 package com.bolara.uno_client.config;
 
 public class Constants {
-    public static final String URL_BASE = "https://ceng453-20242-group13-backend.onrender.com";
+    // public static final String URL_BASE = "https://ceng453-20242-group13-backend.onrender.com";
+    public static final String URL_BASE = "http://localhost:10000";
 
     public static final String URL_LOGIN = URL_BASE + "/login";
     public static final String URL_LOGOUT = URL_BASE + "/logout";
@@ -27,6 +28,8 @@ public class Constants {
     public static final String SCENE_MENU = "/menu.fxml";
     public static final String SCENE_GAME = "/game.fxml";
     public static final String SCENE_SET_REMINDER = "/set_reminder.fxml";
+    public static final String SCENE_LOBBY = "/lobby.fxml";
+
 
     public static final int WindowWidth = 1600;
     public static final int WindowHeight = 900;
