@@ -11,7 +11,6 @@ import java.util.function.Consumer;
 public class GameManager {
     private static GameManager instance = null;
     private String gameId;
-    //private Game game;
     private int playerIndex;
     private Timer pollingTimer;
 
