@@ -21,4 +21,8 @@ public record PlayerGameView (
             int cardCount,
             boolean hasCalledUno) {
     }
+
+    public boolean topCardisWild() {
+        return topCard != null && topCard.color() == Card.Color.WILD;
+    }
 } 

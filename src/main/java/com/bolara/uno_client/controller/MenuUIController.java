@@ -2,6 +2,7 @@ package com.bolara.uno_client.controller;
 
 import com.bolara.uno_client.StageManager;
 import com.bolara.uno_client.config.Constants;
+import com.bolara.uno_client.game.GameManager;
 import com.bolara.uno_client.service.AuthService;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -46,9 +47,13 @@ public class MenuUIController {
         System.out.println("Create Lobby button clicked");
         // createMultiplayerGame()
         // GameUIMultiplayerController oluştur ama onda single playerdaki gibi create game yapma
-        //
-        StageManager.switchScene(Constants.SCENE_LOBBY);
 
+        // Step 1: Create a multiplayer game via GameManager
+        GameManager.getInstance().createMultiplayerGame();
+        System.out.println("game created with ID: " + GameManager.getInstance().getGameId());
+
+        // Step 2: Switch to the multiplayer game scene
+        StageManager.switchScene(Constants.SCENE_LOBBY);
     }
 
     @FXML
@@ -65,9 +70,10 @@ public class MenuUIController {
         // Show dialog and wait for input
         dialog.showAndWait().ifPresent(lobbyId -> {
             System.out.println("User entered lobby ID: " + lobbyId);
-            // TODO: Call backend to join this lobby, then switch scene
             // joinMultiplayerGame()
             // StageManager.switchScene(Constants.SCENE_LOBBY);
+            GameManager.getInstance().joinMultiplayerGame(lobbyId);
+            StageManager.switchScene(Constants.SCENE_LOBBY);
 
         });
     }
