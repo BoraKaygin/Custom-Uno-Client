@@ -40,12 +40,12 @@ public class NetworkController {
         }
     }
 
-    public static boolean joinGame(String gameId) {
+    public static int joinGame(String gameId) {
         try {
             String username = SessionManager.getUsername();
             if (username == null || username.isBlank()) {
                 System.err.println("No username available in session.");
-                return false;
+                return -1;
             }
 
             JoinGameRequest joinDTO = new JoinGameRequest(username);
@@ -61,18 +61,18 @@ public class NetworkController {
 
             if (response.statusCode() == 200) {
                 System.out.println("Joined game successfully.");
-                return true;
+                return mapper.readValue(response.body(), JoinGameResponse.class).addedPlayerIndex();
             } else {
                 System.err.println("Failed to join game.");
                 System.err.println("Status: " + response.statusCode());
                 System.err.println("Response: " + response.body());
-                return false;
+                return -1;
             }
 
         } catch (Exception e) {
             System.err.println("Exception during joinGame: " + e.getMessage());
             e.printStackTrace();
-            return false;
+            return -1;
         }
     }
 

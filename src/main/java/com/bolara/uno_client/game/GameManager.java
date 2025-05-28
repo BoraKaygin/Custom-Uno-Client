@@ -11,7 +11,8 @@ import java.util.function.Consumer;
 public class GameManager {
     private static GameManager instance = null;
     private String gameId;
-    private Game game;
+    //private Game game;
+    private int playerIndex;
     private Timer pollingTimer;
 
 
@@ -32,10 +33,19 @@ public class GameManager {
         instance = null;
     }
 
+    public int getPlayerIndex() {
+        if (instance == null) {
+            System.err.println("GameManager instance is null. Cannot get player index.");
+            return -1;
+        }
+        return instance.playerIndex;
+    }
+
     public void createSinglePlayerGame() {
         instance.gameId = createGame();
-        boolean joined = joinGame(gameId);
-        assert joined;
+        assert instance.gameId != null;
+        playerIndex = joinGame(gameId);
+        assert playerIndex >= 0;
         for (int i = 0; i < 3; i++) {
             addComputerPlayer();
         }
@@ -52,12 +62,12 @@ public class GameManager {
         return gameId;
     }
 
-    private boolean joinGame(String gameId) {
-        boolean joined = NetworkController.joinGame(gameId);
-        if (!joined) {
+    private int joinGame(String gameId) {
+        int playerIndex = NetworkController.joinGame(gameId);
+        if (playerIndex < 0) {
             System.err.println("Failed to join game.");
         }
-        return joined;
+        return playerIndex;
     }
 
     private boolean startGame() {
@@ -73,48 +83,45 @@ public class GameManager {
         return true;
     }
 
-    public boolean playCard(int playerIndex, int cardIndex, Card.Color declaredColor) {
+    public void playCard(int playerIndex, int cardIndex, Card.Color declaredColor) {
         if (gameId == null) {
             System.err.println("Game ID is null. Cannot play card.");
-            return false;
+            return;
         }
         boolean played = NetworkController.playCard(gameId, playerIndex, cardIndex, declaredColor);
         if (!played) {
             System.err.println("Failed to play card.");
         }
-        return played;
     }
 
-    public boolean playCheatCard(int playerIndex, Card card) {
+    public void playCheatCard(int playerIndex, Card card) {
         if (gameId == null) {
             System.err.println("Game ID is null. Cannot play cheat card.");
-            return false;
+            return;
         }
         boolean played = NetworkController.playCheatCard(gameId, playerIndex, card);
         if (!played) {
             System.err.println("Failed to play cheat card.");
         }
-        return played;
     }
 
-    public boolean setTopCardColor(Card.Color color) {
+    public void setTopCardColor(Card.Color color) {
         if (gameId == null) {
             System.err.println("Game ID is null. Cannot set top card color.");
-            return false;
+            return;
         }
-        return NetworkController.setTopCardColor(gameId, color);
+        NetworkController.setTopCardColor(gameId, color);
     }
 
-    public boolean drawCard(int playerIndex) {
+    public void drawCard(int playerIndex) {
         if (gameId == null) {
             System.err.println("Game ID is null. Cannot draw card.");
-            return false;
+            return;
         }
         boolean drawn = NetworkController.drawCard(gameId, playerIndex);
         if (!drawn) {
             System.err.println("Failed to draw card.");
         }
-        return drawn;
     }
 
     private void addComputerPlayer() {
@@ -158,7 +165,7 @@ public class GameManager {
             public void run() {
                 Game fetchedGame = getGame();
                 if (fetchedGame != null) {
-                    instance.game = fetchedGame;
+                    //instance.game = fetchedGame;
                     onUpdate.accept(fetchedGame);
                 }
             }
@@ -172,15 +179,14 @@ public class GameManager {
         }
     }
 
-    public boolean removeGame() {
+    public void removeGame() {
         if (gameId == null) {
             System.err.println("Game ID is null. Cannot remove game.");
-            return false;
+            return;
         }
         boolean removed = NetworkController.removeGame(gameId);
         if (!removed) {
             System.err.println("Failed to remove game.");
         }
-        return removed;
     }
 }

@@ -6,7 +6,7 @@ import com.bolara.uno_client.service.AuthService;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
-public class PasswordResetController {
+public class PasswordResetUIController {
 
     @FXML
     private TextField emailField;

@@ -17,7 +17,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
 
-public class LeaderboardController {
+public class LeaderboardUIController {
 
     @FXML
     private ComboBox<String> timeRangeBox;

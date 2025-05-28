@@ -5,7 +5,7 @@
 
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.bolara.uno_client.controller.SetReminderController"
+      fx:controller="com.bolara.uno_client.controller.SetReminderUIController"
       spacing="15" alignment="CENTER" styleClass="login-background">
 
     <Label text="Set Password Reminder" style="-fx-font-size: 20px;" />

@@ -13,6 +13,7 @@ public record Game(
         int direction,
         Game.GameState state,
         int drawTwoStack,
+        int hasPlayedDrawFour,
         String winnerUsername
 ) {
     public enum GameState {

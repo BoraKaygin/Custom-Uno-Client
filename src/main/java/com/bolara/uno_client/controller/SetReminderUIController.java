@@ -10,7 +10,7 @@ import okhttp3.*;
 
 import java.io.IOException;
 
-public class SetReminderController {
+public class SetReminderUIController {
 
     @FXML private TextField emailField;
     @FXML private TextField reminderField;

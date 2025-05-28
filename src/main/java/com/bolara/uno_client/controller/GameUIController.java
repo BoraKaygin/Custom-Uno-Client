@@ -27,7 +27,7 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class GameController {
+public class GameUIController {
 
     @FXML
     private HBox topHand;
@@ -68,7 +68,7 @@ public class GameController {
 
     private GameManager gameManager;
 
-    private final int PLAYER_INDEX = 0;
+    private int playerIndex = 0;
 
     private boolean promptUp = false;
 
@@ -84,6 +84,7 @@ public class GameController {
         gameManager.createSinglePlayerGame();
         gameManager.startPolling(this::onUpdate);
         Game game = gameManager.getGame();
+        playerIndex = gameManager.getPlayerIndex();
 
         Hand player = game.players().get(0);
         for (int i = 0; i < player.cards().size(); i++) {
@@ -261,7 +262,7 @@ public class GameController {
                 if (clickedCard.color() == Card.Color.WILD) {
                     clickedCard = promptColorSelection(clickedCard);
                 }
-                gameManager.playCard(PLAYER_INDEX, index, clickedCard.color());
+                gameManager.playCard(playerIndex, index, clickedCard.color());
             });
         }
 
@@ -282,7 +283,7 @@ public class GameController {
     private void handleCheatSkip() {
         Card.Color color = Objects.requireNonNull(gameManager.getGame().getTopCard()).color();
         Card cheatCard = new Card(color, Type.SKIP, -1);
-        gameManager.playCheatCard(PLAYER_INDEX, cheatCard);
+        gameManager.playCheatCard(playerIndex, cheatCard);
     }
 
 
@@ -290,14 +291,14 @@ public class GameController {
     private void handleCheatReverse() {
         Card.Color color = Objects.requireNonNull(gameManager.getGame().getTopCard()).color();
         Card cheatCard = new Card(color, Type.REVERSE, -1);
-        gameManager.playCheatCard(PLAYER_INDEX, cheatCard);
+        gameManager.playCheatCard(playerIndex, cheatCard);
     }
 
     @FXML  // here, instead of red, put the game's current color (top card of the discard pile)
     private void handleCheatDrawTwo() {
         Card.Color color = Objects.requireNonNull(gameManager.getGame().getTopCard()).color();
         Card cheatCard = new Card(color, Type.DRAW_TWO, -1);
-        gameManager.playCheatCard(PLAYER_INDEX, cheatCard);
+        gameManager.playCheatCard(playerIndex, cheatCard);
     }
 
     @FXML  // here, instead of red, put the game's current color (top card of the discard pile)
@@ -305,14 +306,14 @@ public class GameController {
         ;
         Card cheatCard = new Card(Card.Color.WILD, Type.WILD_CHANGE_COLOR, -1);
         cheatCard = promptColorSelection(cheatCard);
-        gameManager.playCheatCard(PLAYER_INDEX, cheatCard);
+        gameManager.playCheatCard(playerIndex, cheatCard);
     }
 
     @FXML
     private void handleCheatWildDrawFour() {
         Card cheatCard = new Card(Card.Color.WILD, Type.WILD_DRAW_FOUR, -1);
         cheatCard = promptColorSelection(cheatCard);
-        gameManager.playCheatCard(PLAYER_INDEX, cheatCard);
+        gameManager.playCheatCard(playerIndex, cheatCard);
     }
 
 //    private void simulateCardClick(Card card) {
@@ -349,7 +350,7 @@ public class GameController {
     @FXML
     private void handleDrawCard() {
         System.out.println("Deck clicked!");
-        gameManager.drawCard(PLAYER_INDEX);
+        gameManager.drawCard(playerIndex);
     }
 
     private void highlightCurrentTurn(int currentTurn) {

@@ -7,7 +7,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.util.Pair;
 
-public class MenuController {
+public class MenuUIController {
 
     @FXML
     private Label statusLabel;

@@ -4,17 +4,12 @@ import com.bolara.uno_client.StageManager;
 import com.bolara.uno_client.config.Constants;
 import com.bolara.uno_client.service.AuthService;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.PasswordField;
-import javafx.stage.Stage;
 import javafx.util.Pair;
 
-import java.io.IOException;
-
-public class LoginController {
+public class LoginUIController {
     @FXML
     private TextField usernameField;
 
