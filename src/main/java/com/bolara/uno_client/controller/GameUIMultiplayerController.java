@@ -4,6 +4,7 @@ import com.bolara.uno_client.StageManager;
 import com.bolara.uno_client.config.Constants;
 import com.bolara.uno_client.dto.Game;
 import com.bolara.uno_client.dto.Hand;
+import com.bolara.uno_client.dto.PlayerGameView;
 import com.bolara.uno_client.game.GameManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -15,10 +16,10 @@ import javafx.scene.image.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import com.bolara.uno_client.dto.Card;
-import com.bolara.uno_client.dto.Card.Type;
 import javafx.scene.control.Label;
 
 import java.net.URL;
@@ -27,7 +28,7 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class GameUIController {
+public class GameUIMultiplayerController {
 
     @FXML
     private HBox topHand;
@@ -36,7 +37,7 @@ public class GameUIController {
     @FXML
     private VBox rightHand;
     @FXML
-    private HBox playerHand;
+    private HBox bottomHand;
 
     @FXML
     private ImageView directionArrow;
@@ -46,7 +47,7 @@ public class GameUIController {
     private ImageView deckImage;
 
     @FXML
-    private Label playerUnoLabel;
+    private Label bottomUnoLabel;
     @FXML
     private Label topUnoLabel;
     @FXML
@@ -55,7 +56,7 @@ public class GameUIController {
     private Label rightUnoLabel;
 
     @FXML
-    private Label playerNameLabel;
+    private Label bottomNameLabel;
     @FXML
     private Label topNameLabel;
     @FXML
@@ -68,7 +69,7 @@ public class GameUIController {
 
     private GameManager gameManager;
 
-    private int playerIndex = 0;
+    private int playerIndex = -1;
 
     private boolean promptUp = false;
 
@@ -77,58 +78,46 @@ public class GameUIController {
         // Load arrow and deck image
         Image arrowImg = new Image(getClass().getResource("/assets/arrow.png").toExternalForm());
         Image deck = new Image(getClass().getResource("/assets/deck.png").toExternalForm());
+        Image backCard = new Image(getClass().getResource("/assets/back.png").toExternalForm());
         directionArrow.setImage(arrowImg);
         deckImage.setImage(deck);
 
         gameManager = GameManager.getInstance();
-        gameManager.createSinglePlayerGame();// multiplayerda bu olmayacak
-        gameManager.startPollingGame(this::onUpdate);
-        Game game = gameManager.getGame(); // multiplayerde getPlayerGameview olacak bunun yerine
+        gameManager.startPollingPlayerView(this::onUpdate);
+        PlayerGameView gameView = gameManager.getPlayerGameView();
         playerIndex = gameManager.getPlayerIndex();
 
-        Hand player = game.players().get(0);
-        for (int i = 0; i < player.cards().size(); i++) {
-            playerHand.getChildren().add(createColoredCard(player.cards().get(i), true));
-        }
-        Hand top = game.players().get(2);
-        for (int i = 0; i < top.cards().size(); i++) {
-            topHand.getChildren().add(createColoredCard(top.cards().get(i), false));
-        }
-        Hand left = game.players().get(1);
-        for (int i = 0; i < left.cards().size(); i++) {
-            leftHand.getChildren().add(createColoredCard(left.cards().get(i), false));
-        }
-        Hand right = game.players().get(3);
-        for (int i = 0; i < right.cards().size(); i++) {
-            rightHand.getChildren().add(createColoredCard(right.cards().get(i), false));
-        }
+        List<PlayerGameView.PlayerInfo> players = gameView.players();
+        int playerCount = players.size();
 
-
-        updateDirectionArrow(game.direction());
-        showTopCard(game);
-        updateUnoIndicators(game.players());
-        highlightCurrentTurn(game.currentTurn());
-
+        bottomNameLabel.setText(players.getFirst().username());
+        leftNameLabel.setText(players.get(1).username());
+        if (playerCount >= 3) {
+            topNameLabel.setText(players.get(2).username());
+        }
+        if (playerCount == 4) {
+            rightNameLabel.setText(players.get(3).username());
+        }
     }
 
-    private void onUpdate(Game game) {
+    private void onUpdate(PlayerGameView gameView) {
         Platform.runLater(() -> {
-            if (game.topCardisWild() && !promptUp) {
+            if (gameView.topCardisWild() && !promptUp) {
                 promptUp = true;
-                Card topCard = game.discardPile().getLast();
+                Card topCard = gameView.topCard();
                 topCard = promptColorSelection(topCard);
                 gameManager.setTopCardColor(topCard.color());
             }
-            if (!game.topCardisWild()) {
+            if (!gameView.topCardisWild()) {
                 promptUp = false;
             }
-            if (game.state() == Game.GameState.FINISHED) {
+            if (gameView.state() == Game.GameState.FINISHED) {
                 gameManager.stopPolling();
                 Platform.runLater(() -> {
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
                     alert.setTitle("Game Over");
                     alert.setHeaderText("🎉 Game Finished!");
-                    String winner = game.winnerUsername() != null ? game.winnerUsername() : "No one";
+                    String winner = gameView.winnerUsername() != null ? gameView.winnerUsername() : "No one";
                     alert.setContentText("Winner: " + winner);
 
                     DialogPane dialogPane = alert.getDialogPane();
@@ -140,57 +129,58 @@ public class GameUIController {
                 return; // Prevent updating hands after game ends
             }
 
-            updateDirectionArrow(game.direction());
-            showTopCard(game);
-            updateUnoIndicators(game.players());
-            highlightCurrentTurn(game.currentTurn());
+            updateDirectionArrow(gameView.direction());
+            showTopCard(gameView);
+            updateUnoIndicators(gameView.players());
+            highlightCurrentTurn(gameView.currentTurn());
 
             // Clear existing cards
-            playerHand.getChildren().clear();
+            bottomHand.getChildren().clear();
             topHand.getChildren().clear();
             leftHand.getChildren().clear();
             rightHand.getChildren().clear();
 
-            // Add updated cards
-            Hand player = game.players().get(0);
-            for (Card card : player.cards()) {
-                playerHand.getChildren().add(createColoredCard(card, true));
+            int playerCount = gameView.players().size();
+            setHand(bottomHand, 0, gameView);
+            setHand(leftHand, 1, gameView);
+            if (playerCount >= 3){
+                setHand(topHand, 2, gameView);
+            }
+            if (playerCount == 4) {
+                setHand(rightHand, 3, gameView);
             }
 
-            Hand top = game.players().get(2);
-            for (Card card : top.cards()) {
-                topHand.getChildren().add(createColoredCard(card, false));
-            }
-
-            Hand left = game.players().get(1);
-            for (Card card : left.cards()) {
-                leftHand.getChildren().add(createColoredCard(card, false));
-            }
-
-            Hand right = game.players().get(3);
-            for (Card card : right.cards()) {
-                rightHand.getChildren().add(createColoredCard(card, false));
-            }
-            adjustHorizontalSpacing(playerHand, player.cards());
-            adjustHorizontalSpacing(topHand, top.cards());
-
-            adjustVerticalSpacing(leftHand, left.cards());
-            adjustVerticalSpacing(rightHand, right.cards());
-
+            adjustHorizontalSpacing(bottomHand);
+            adjustHorizontalSpacing(topHand);
+            adjustVerticalSpacing(leftHand);
+            adjustVerticalSpacing(rightHand);
         });
     }
 
-    private void adjustHorizontalSpacing(HBox handBox, List<Card> cards) {
-        int cardCount = cards.size();
+    private void setHand(Pane hand, int handNo, PlayerGameView gameView) {
+        if (handNo == playerIndex) {
+            Hand player = gameView.playerHand();
+            for (Card card : player.cards()) {
+                hand.getChildren().add(createColoredCard(card, hand));
+            }
+        } else {
+            int handCount = gameView.players().get(handNo).cardCount();
+            for (int i = 0; i < handCount; i++) {
+                hand.getChildren().add(createBackCard());
+            }
+        }
+    }
+
+    private void adjustHorizontalSpacing(HBox handBox) {
+        int cardCount = handBox.getChildren().size();
         double maxSpacing = 10;
         double minSpacing = -10;
 
         double spacing = Math.max(minSpacing, maxSpacing - cardCount);
         handBox.setSpacing(spacing);
     }
-    private void adjustVerticalSpacing(VBox handBox, List<Card> cards) {
-        int cardCount = cards.size();
-
+    private void adjustVerticalSpacing(VBox handBox) {
+        int cardCount = handBox.getChildren().size();
         double spacing;
         if (cardCount < 8) {
             // For small hands, more separation (e.g. -25 to -35)
@@ -208,7 +198,17 @@ public class GameUIController {
         handBox.setSpacing(spacing);
     }
 
-    private ImageView createColoredCard(Card card, boolean isPlayerCard) {
+
+    private ImageView createBackCard() {
+        Image backImage = new Image(getClass().getResource("/assets/back.png").toExternalForm());
+        ImageView view = new ImageView(backImage);
+        view.setFitWidth(50);
+        view.setPreserveRatio(true);
+        view.setRotate(new Random().nextDouble(-5, 5)); // adds some realism
+        return view;
+    };
+
+    private ImageView createColoredCard(Card card, Pane playerPane) {
         String valueImage = switch (card.type()) {
             case NUMBER -> "_" + card.number() + ".png";
             case SKIP -> "_skip.png";
@@ -240,69 +240,30 @@ public class GameUIController {
         // Store card info
         view.setUserData(card);
 
-        // Add click handler if this card belongs to the player
-        if (isPlayerCard) {
-            view.setOnMouseClicked(e -> {
-                Card clickedCard = (Card) view.getUserData();
-                System.out.println("Card clicked: " + clickedCard);
-                int index = getCardIndex(clickedCard);
-                System.out.println("Card index: " + index);
+        // Add click handler
+        view.setOnMouseClicked(e -> {
+            Card clickedCard = (Card) view.getUserData();
+            System.out.println("Card clicked: " + clickedCard);
+            int index = getCardIndex(clickedCard, playerPane);
+            System.out.println("Card index: " + index);
 
-                if (clickedCard.color() == Card.Color.WILD) {
-                    clickedCard = promptColorSelection(clickedCard);
-                }
-                gameManager.playCard(playerIndex, index, clickedCard.color());
-            });
-        }
+            if (clickedCard.color() == Card.Color.WILD) {
+                clickedCard = promptColorSelection(clickedCard);
+            }
+            gameManager.playCard(playerIndex, index, clickedCard.color());
+        });
 
         return view;
     }
 
-    public int getCardIndex(Card card) {
-        for (int i = 0; i < playerHand.getChildren().size(); i++) {
-            ImageView view = (ImageView) playerHand.getChildren().get(i);
+    public int getCardIndex(Card card, Pane playerPane) {
+        for (int i = 0; i < playerPane.getChildren().size(); i++) {
+            ImageView view = (ImageView) playerPane.getChildren().get(i);
             if (view.getUserData().equals(card)) {
                 return i;
             }
         }
         return -1; // Not found
-    }
-
-    @FXML  // here, instead of red, put the game's current color (top card of the discard pile)
-    private void handleCheatSkip() {
-        Card.Color color = Objects.requireNonNull(gameManager.getGame().getTopCard()).color();
-        Card cheatCard = new Card(color, Type.SKIP, -1);
-        gameManager.playCheatCard(playerIndex, cheatCard);
-    }
-
-
-    @FXML  // here, instead of red, put the game's current color (top card of the discard pile)
-    private void handleCheatReverse() {
-        Card.Color color = Objects.requireNonNull(gameManager.getGame().getTopCard()).color();
-        Card cheatCard = new Card(color, Type.REVERSE, -1);
-        gameManager.playCheatCard(playerIndex, cheatCard);
-    }
-
-    @FXML  // here, instead of red, put the game's current color (top card of the discard pile)
-    private void handleCheatDrawTwo() {
-        Card.Color color = Objects.requireNonNull(gameManager.getGame().getTopCard()).color();
-        Card cheatCard = new Card(color, Type.DRAW_TWO, -1);
-        gameManager.playCheatCard(playerIndex, cheatCard);
-    }
-
-    @FXML  // here, instead of red, put the game's current color (top card of the discard pile)
-    private void handleCheatWild() {
-        ;
-        Card cheatCard = new Card(Card.Color.WILD, Type.WILD_CHANGE_COLOR, -1);
-        cheatCard = promptColorSelection(cheatCard);
-        gameManager.playCheatCard(playerIndex, cheatCard);
-    }
-
-    @FXML
-    private void handleCheatWildDrawFour() {
-        Card cheatCard = new Card(Card.Color.WILD, Type.WILD_DRAW_FOUR, -1);
-        cheatCard = promptColorSelection(cheatCard);
-        gameManager.playCheatCard(playerIndex, cheatCard);
     }
 
     private Card promptColorSelection(Card clickedCard) {
@@ -333,14 +294,14 @@ public class GameUIController {
 
     private void highlightCurrentTurn(int currentTurn) {
         // Clear all highlights first
-        playerNameLabel.getStyleClass().remove("highlight-turn");
+        bottomNameLabel.getStyleClass().remove("highlight-turn");
         topNameLabel.getStyleClass().remove("highlight-turn");
         leftNameLabel.getStyleClass().remove("highlight-turn");
         rightNameLabel.getStyleClass().remove("highlight-turn");
 
         // Add highlight to current player
         switch (currentTurn) {
-            case 0 -> playerNameLabel.getStyleClass().add("highlight-turn");
+            case 0 -> bottomNameLabel.getStyleClass().add("highlight-turn");
             case 1 -> leftNameLabel.getStyleClass().add("highlight-turn");
             case 2 -> topNameLabel.getStyleClass().add("highlight-turn");
             case 3 -> rightNameLabel.getStyleClass().add("highlight-turn");
@@ -356,19 +317,21 @@ public class GameUIController {
         }
     }
 
-    private void updateUnoIndicators(List<Hand> hands) {
-        if (hands.size() < 4) return; // Safety
-
-        playerUnoLabel.setVisible(hands.get(0).calledUno());
-        leftUnoLabel.setVisible(hands.get(1).calledUno());
-        topUnoLabel.setVisible(hands.get(2).calledUno());
-        rightUnoLabel.setVisible(hands.get(3).calledUno());
+    private void updateUnoIndicators(List<PlayerGameView.PlayerInfo> hands) {
+        bottomUnoLabel.setVisible(hands.get(0).hasCalledUno());
+        leftUnoLabel.setVisible(hands.get(1).hasCalledUno());
+        if (hands.size() >= 3) {
+            topUnoLabel.setVisible(hands.get(2).hasCalledUno());
+        }
+        if (hands.size() == 4) {
+            rightUnoLabel.setVisible(hands.get(3).hasCalledUno());
+        }
     }
 
-    private void showTopCard(Game game) {
-        if (game.discardPile().isEmpty()) return;
+    private void showTopCard(PlayerGameView gameView) {
+        if (gameView.topCard() == null) return;
 
-        Card topCard = game.discardPile().get(game.discardPile().size() - 1);
+        Card topCard = gameView.topCard();
 
         String valueImage = switch (topCard.type()) {
             case NUMBER -> "_" + topCard.number() + ".png";
@@ -441,76 +404,3 @@ public class GameUIController {
         StageManager.switchScene(Constants.SCENE_MENU);
     }
 }
-
-/*
-@FXML
-private void handleCardClick(int cardIndex) {
-    int playerIndex = ...; // get this from game state (e.g. your hand is at index 0)
-    String declaredColor = null;
-
-    // Only declare color for wild cards
-    Card selected = hand.cards().get(cardIndex);
-    if (selected.type() == Card.Type.WILD_CHANGE_COLOR || selected.type() == Card.Type.WILD_DRAW_FOUR) {
-        // You can show a dialog or hardcode for testing
-        declaredColor = "RED"; // or use a color picker
-    }
-
-    boolean success = gameManager.playCard(playerIndex, cardIndex, declaredColor);
-    if (!success) {
-        // show message to user
-        System.err.println("Invalid move.");
-    }
-}
-
-@FXML
-private void handleDrawCard() {
-    int playerIndex = getYourPlayerIndex(); // this depends on your logic
-
-    boolean success = gameManager.drawCard(playerIndex);
-    if (!success) {
-        System.err.println("Failed to draw card. Maybe you still have playable cards.");
-    }
-}
-
-@FXML
-private void handleExitGame() {
-    boolean success = gameManager.removeGame();
-    if (success) {
-        System.out.println("Returned to main menu.");
-        // TODO: Navigate to main menu scene
-    } else {
-        System.err.println("Failed to remove game.");
-    }
-}
-
-{
-            System.out.println("\n========== GAME STATE ==========");
-
-            System.out.println("State         : " + game.state());
-            System.out.println("Current Turn  : " + game.players().get(game.currentTurn()).username());
-            System.out.println("Direction     : " + (game.direction() == 1 ? "Clockwise" : "Counter-clockwise"));
-            System.out.println("Draw2 Stack   : " + game.drawTwoStack());
-            System.out.println("Winner        : " + (game.winnerUsername() != null ? game.winnerUsername() : "None"));
-
-            System.out.println("\n--- Player Hands ---");
-            for (int i = 0; i < game.players().size(); i++) {
-                var hand = game.players().get(i);
-                String playerLabel = (i == game.currentTurn() ? "👉 " : "   ") + hand.username();
-                System.out.println(playerLabel + " (" + hand.cards().size() + " cards):");
-
-                for (Card c : hand.cards()) {
-                    System.out.printf("   - %-6s %-20s %s\n", c.color(), c.type(), (c.number() >= 0 ? c.number() : ""));
-                }
-
-                System.out.println();
-            }
-
-            System.out.println("--- Top Discard Card ---");
-            if (!game.discardPile().isEmpty()) {
-                Card top = game.discardPile().get(game.discardPile().size() - 1);
-                System.out.printf("Color: %-6s Type: %-20s Number: %s\n", top.color(), top.type(), top.number() >= 0 ? top.number() : "");
-            }
-
-            System.out.println("========== END STATE ==========\n");
-        }
-*/

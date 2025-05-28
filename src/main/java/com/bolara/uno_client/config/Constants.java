@@ -29,6 +29,8 @@ public class Constants {
     public static final String SCENE_GAME = "/game.fxml";
     public static final String SCENE_SET_REMINDER = "/set_reminder.fxml";
     public static final String SCENE_LOBBY = "/lobby.fxml";
+    public static final String SCENE_GAME_MULTIPLAYER = "/game_multiplayer.fxml";
+
 
 
     public static final int WindowWidth = 1600;
