@@ -278,6 +278,31 @@ public class NetworkController {
         }
     }
 
+    public static PlayerGameView getPlayerGameView(String gameId, int playerIndex) {
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(Constants.URL_GAME + "/" + gameId + "/player/" + playerIndex))
+                    .header("Cookie", SessionManager.getSessionCookie())
+                    .GET()
+                    .build();
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                return mapper.readValue(response.body(), PlayerGameView.class);
+            } else {
+                System.err.println("Failed to fetch player game view.");
+                System.err.println("Status: " + response.statusCode());
+                System.err.println("Response: " + response.body());
+                return null;
+            }
+
+        } catch (Exception e) {
+            System.err.println("Exception during getPlayerGameView: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public static boolean removeGame(String gameId) {
         try {
             String uri = Constants.URL_GAME + "/" + gameId;
@@ -305,5 +330,4 @@ public class NetworkController {
             return false;
         }
     }
-
 }

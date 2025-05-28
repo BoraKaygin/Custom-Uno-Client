@@ -3,6 +3,7 @@ package com.bolara.uno_client.game;
 import com.bolara.uno_client.controller.NetworkController;
 import com.bolara.uno_client.dto.Card;
 import com.bolara.uno_client.dto.Game;
+import com.bolara.uno_client.dto.PlayerGameView;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -10,8 +11,8 @@ import java.util.function.Consumer;
 
 public class GameManager {
     private static GameManager instance = null;
-    private String gameId;
-    private int playerIndex;
+    private String gameId = null;
+    private int playerIndex = -1;
     private Timer pollingTimer;
 
 
@@ -27,26 +28,48 @@ public class GameManager {
     }
 
     public void resetInstance() {
-        instance.stopPolling();
-        instance.removeGame();
+        stopPolling();
+        removeGame();
         instance = null;
     }
 
+    public String getGameId() {
+        return gameId;
+    }
+
     public int getPlayerIndex() {
-        if (instance == null) {
-            System.err.println("GameManager instance is null. Cannot get player index.");
-            return -1;
-        }
-        return instance.playerIndex;
+        return playerIndex;
     }
 
     public void createSinglePlayerGame() {
-        instance.gameId = createGame();
-        assert instance.gameId != null;
+        gameId = createGame();
+        assert gameId != null;
         playerIndex = joinGame(gameId);
         assert playerIndex >= 0;
         for (int i = 0; i < 3; i++) {
             addComputerPlayer();
+        }
+        boolean started = startGame();
+        assert started;
+    }
+
+    public void createMultiplayerGame() {
+        gameId = createGame();
+        assert gameId != null;
+        playerIndex = joinGame(gameId);
+        assert playerIndex >= 0;
+    }
+
+    public void joinMultiplayerGame(String gameId) {
+        playerIndex = joinGame(gameId);
+        assert playerIndex >= 0;
+        this.gameId = gameId;
+    }
+
+    public void startMultiplayerGame() {
+        if (playerIndex != 0) {
+            System.err.println("Cannot start game. Player is not host.");
+            return;
         }
         boolean started = startGame();
         assert started;
@@ -147,7 +170,43 @@ public class GameManager {
         return game;
     }
 
-    public void startPolling(Consumer<Game> onUpdate) {
+    public PlayerGameView getPlayerGameView() {
+        if (gameId == null) {
+            System.err.println("Game ID is null. Cannot get player game view.");
+            return null;
+        }
+        PlayerGameView playerGameView = NetworkController.getPlayerGameView(gameId, playerIndex);
+        if (playerGameView == null) {
+            System.err.println("Failed to get player game view.");
+            return null;
+        }
+        return playerGameView;
+    }
+
+    public void startPollingPlayerView(Consumer<PlayerGameView> onUpdate) {
+        if (gameId == null) {
+            System.err.println("Game ID is null. Cannot start polling player view.");
+            return;
+        }
+
+        if (pollingTimer != null) {
+            pollingTimer.cancel();
+        }
+
+        pollingTimer = new Timer(true);
+
+        pollingTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                PlayerGameView fetchedView = getPlayerGameView();
+                if (fetchedView != null) {
+                    onUpdate.accept(fetchedView);
+                }
+            }
+        }, 0, 2000);
+    }
+
+    public void startPollingGame(Consumer<Game> onUpdate) {
         if (gameId == null) {
             System.err.println("Game ID is null. Cannot start polling.");
             return;
@@ -164,11 +223,10 @@ public class GameManager {
             public void run() {
                 Game fetchedGame = getGame();
                 if (fetchedGame != null) {
-                    //instance.game = fetchedGame;
                     onUpdate.accept(fetchedGame);
                 }
             }
-        }, 0, 1000); // In milliseconds. Set this to 2000 later
+        }, 0, 2000);
     }
 
     public void stopPolling() {
