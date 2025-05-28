@@ -8,7 +8,7 @@ public class Constants {
     public static final String URL_LOGOUT = URL_BASE + "/logout";
     public static final String URL_REGISTER = URL_BASE + "/register";
     public static final String URL_PASSWORD_REMINDER_GET = URL_BASE + "/password-reminder/get";
-    // TODO: also add password reminder set
+    public static final String URL_PASSWORD_REMINDER_SET = URL_BASE + "/password-reminder/set";
     public static final String URL_PASSWORD_RESET_REQUEST = URL_BASE + "/password-reset/request";
     public static final String URL_PASSWORD_RESET_CONFIRM = URL_BASE + "/password-reset/confirm";
     public static final String URL_LEADERBOARD_WEEK = URL_BASE + "/leaderboard/week";

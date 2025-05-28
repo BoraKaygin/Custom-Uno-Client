@@ -170,13 +170,13 @@ public class NetworkController {
 
     public static boolean setTopCardColor(String gameId, Card.Color declaredColor) {
         try {
-            StringBuilder uri = new StringBuilder(Constants.URL_GAME)
-                    .append("/").append(gameId)
-                    .append("/set-top-color")
-                    .append("?declaredColor=").append(declaredColor);
+            String uri = Constants.URL_GAME +
+                    "/" + gameId +
+                    "/set-top-color" +
+                    "?declaredColor=" + declaredColor;
 
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(uri.toString()))
+                    .uri(URI.create(uri))
                     .POST(HttpRequest.BodyPublishers.noBody())
                     .header("Content-Type", "application/json")
                     .header("Cookie", SessionManager.getSessionCookie())
@@ -219,7 +219,6 @@ public class NetworkController {
                 System.err.println("Response: " + response.body());
                 return false;
             }
-
         } catch (Exception e) {
             System.err.println("Exception while drawing card: " + e.getMessage());
             e.printStackTrace();
@@ -227,6 +226,32 @@ public class NetworkController {
         }
     }
 
+    public static boolean callUno(String gameId, int playerIndex) {
+        try {
+            String uri = Constants.URL_GAME + "/" + gameId + "/call-uno?playerIndex=" + playerIndex;
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(uri))
+                    .header("Cookie", SessionManager.getSessionCookie())
+                    .POST(HttpRequest.BodyPublishers.noBody())
+                    .build();
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                System.out.println("Uno called successfully.");
+                return true;
+            } else {
+                System.err.println("Failed to call Uno.");
+                System.err.println("Status: " + response.statusCode());
+                System.err.println("Response: " + response.body());
+                return false;
+            }
+        } catch (Exception e) {
+            System.err.println("Exception while calling Uno: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     public static boolean addComputerPlayer(String gameId) {
         try {

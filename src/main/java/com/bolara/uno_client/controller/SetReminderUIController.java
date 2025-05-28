@@ -37,7 +37,7 @@ public class SetReminderUIController {
 
         RequestBody body = RequestBody.create(json, MediaType.parse("application/json"));
         Request request = new Request.Builder()
-                .url(Constants.URL_BASE + "/password-reminder/set")
+                .url(Constants.URL_PASSWORD_REMINDER_SET)
                 .header("Cookie", SessionManager.getSessionCookie())
                 .post(body)
                 .build();
