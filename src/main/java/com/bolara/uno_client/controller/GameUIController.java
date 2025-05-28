@@ -82,7 +82,7 @@ public class GameUIController {
 
         gameManager = GameManager.getInstance();
         gameManager.createSinglePlayerGame();
-        gameManager.startPolling(this::onUpdate);
+        gameManager.startPollingGame(this::onUpdate);
         Game game = gameManager.getGame();
         playerIndex = gameManager.getPlayerIndex();
 
