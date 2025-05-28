@@ -132,7 +132,10 @@ public class GameManager {
             System.err.println("Game ID is null. Cannot set top card color.");
             return;
         }
-        NetworkController.setTopCardColor(gameId, color);
+        boolean colorSet = NetworkController.setTopCardColor(gameId, color);
+        if (!colorSet) {
+            System.err.println("Failed to set top card color.");
+        }
     }
 
     public void drawCard(int playerIndex) {
@@ -143,6 +146,17 @@ public class GameManager {
         boolean drawn = NetworkController.drawCard(gameId, playerIndex);
         if (!drawn) {
             System.err.println("Failed to draw card.");
+        }
+    }
+
+    public void callUno(int playerIndex) {
+        if (gameId == null) {
+            System.err.println("Game ID is null. Cannot call Uno.");
+            return;
+        }
+        boolean called = NetworkController.callUno(gameId, playerIndex);
+        if (!called) {
+            System.err.println("Failed to call Uno.");
         }
     }
 
