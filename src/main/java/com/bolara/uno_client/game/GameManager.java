@@ -138,6 +138,17 @@ public class GameManager {
         }
     }
 
+public void challengeDrawFour(int playerIndex) {
+        if (gameId == null) {
+            System.err.println("Game ID is null. Cannot challenge Draw Four.");
+            return;
+        }
+        boolean challenged = NetworkController.challengeDrawFour(gameId, playerIndex);
+        if (!challenged) {
+            System.err.println("Failed to challenge Draw Four.");
+        }
+    }
+
     public void drawCard(int playerIndex) {
         if (gameId == null) {
             System.err.println("Game ID is null. Cannot draw card.");
