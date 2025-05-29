@@ -198,6 +198,32 @@ public class NetworkController {
         }
     }
 
+    public static boolean challengeDrawFour(String gameId, int playerIndex) {
+        try {
+            String uri = Constants.URL_GAME + "/" + gameId + "/challenge-draw-four?playerIndex=" + playerIndex;
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(uri))
+                    .header("Cookie", SessionManager.getSessionCookie())
+                    .POST(HttpRequest.BodyPublishers.noBody())
+                    .build();
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                System.out.println("Draw Four challenge successful.");
+                return true;
+            } else {
+                System.err.println("Failed to challenge Draw Four.");
+                System.err.println("Status: " + response.statusCode());
+                System.err.println("Response: " + response.body());
+                return false;
+            }
+        } catch (Exception e) {
+            System.err.println("Exception while challenging Draw Four: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     public static boolean drawCard(String gameId, int playerIndex) {
         try {
