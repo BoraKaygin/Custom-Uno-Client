@@ -9,9 +9,7 @@ import com.bolara.uno_client.game.GameManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.SnapshotParameters;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ChoiceDialog;
-import javafx.scene.control.DialogPane;
+import javafx.scene.control.*;
 import javafx.scene.image.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.canvas.Canvas;
@@ -20,7 +18,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import com.bolara.uno_client.dto.Card;
-import javafx.scene.control.Label;
 
 import java.net.URL;
 import java.util.List;
@@ -64,6 +61,17 @@ public class GameUIMultiplayerController {
     @FXML
     private Label rightNameLabel;
 
+    @FXML private Button bottomCallUnoButton;
+    @FXML private Button leftCallUnoButton;
+    @FXML private Button topCallUnoButton;
+    @FXML private Button rightCallUnoButton;
+
+    @FXML private Button bottomChallengeButton;
+    @FXML private Button leftChallengeButton;
+    @FXML private Button topChallengeButton;
+    @FXML private Button rightChallengeButton;
+
+
     @FXML
     private javafx.scene.shape.Rectangle currentColorBox;
 
@@ -72,6 +80,8 @@ public class GameUIMultiplayerController {
     private int playerIndex = -1;
 
     private boolean promptUp = false;
+    private boolean challengeActive = true;  // Tracks if challenge is still valid
+
 
     @FXML
     public void initialize() {
@@ -97,6 +107,17 @@ public class GameUIMultiplayerController {
         }
         if (playerCount == 4) {
             rightNameLabel.setText(players.get(3).username());
+        }
+
+        if (players.size() < 3) {
+            topHand.setVisible(false);
+            topNameLabel.setVisible(false);
+            topUnoLabel.setVisible(false);
+        }
+        if (players.size() < 4) {
+            rightHand.setVisible(false);
+            rightNameLabel.setVisible(false);
+            rightUnoLabel.setVisible(false);
         }
     }
 
@@ -150,11 +171,44 @@ public class GameUIMultiplayerController {
                 setHand(rightHand, 3, gameView);
             }
 
+
             adjustHorizontalSpacing(bottomHand);
             adjustHorizontalSpacing(topHand);
             adjustVerticalSpacing(leftHand);
             adjustVerticalSpacing(rightHand);
+
+            List<PlayerGameView.PlayerInfo> players = gameView.players();
+
+            for (int i = 0; i < players.size(); i++) {
+                PlayerGameView.PlayerInfo player = players.get(i);
+
+                boolean isLocal = (i == playerIndex);
+                boolean showUno = isLocal && !player.hasCalledUno();
+
+                switch (i) {
+                    case 0 -> bottomCallUnoButton.setVisible(showUno);
+                    case 1 -> leftCallUnoButton.setVisible(showUno);
+                    case 2 -> topCallUnoButton.setVisible(showUno);
+                    case 3 -> rightCallUnoButton.setVisible(showUno);
+                }
+            }
+
+            Card topCard = gameView.topCard();
+            boolean isWildDrawFour = topCard != null && topCard.type() == Card.Type.WILD_DRAW_FOUR;
+
+            // Only show challenge button if it's this player's turn, top card is Wild Draw Four,
+            // and challenge hasn't been used yet
+            if (isWildDrawFour && gameView.currentTurn() == playerIndex && challengeActive) {
+                showOnlyLocalPlayerChallengeButton();
+            } else {
+                hideAllChallengeButtons();
+            }
+
+
         });
+
+
+
     }
 
     private void setHand(Pane hand, int handNo, PlayerGameView gameView) {
@@ -402,5 +456,33 @@ public class GameUIMultiplayerController {
     private void handleBackToMenu() {
         gameManager.resetInstance();
         StageManager.switchScene(Constants.SCENE_MENU);
+    }
+
+    @FXML
+    private void handleCallUno() {
+        gameManager.callUno(playerIndex);  // assumes GameManager handles the REST call
+    }
+
+    @FXML
+    private void handleChallengeDrawFour() {
+        challengeActive = false;
+        gameManager.challengeDrawFour(playerIndex);  // notify backend
+        hideAllChallengeButtons();                   // hide after clicking
+    }
+
+    private void showOnlyLocalPlayerChallengeButton() {
+        switch (playerIndex) {
+            case 0 -> bottomChallengeButton.setVisible(true);
+            case 1 -> leftChallengeButton.setVisible(true);
+            case 2 -> topChallengeButton.setVisible(true);
+            case 3 -> rightChallengeButton.setVisible(true);
+        }
+    }
+
+    private void hideAllChallengeButtons() {
+        bottomChallengeButton.setVisible(false);
+        leftChallengeButton.setVisible(false);
+        topChallengeButton.setVisible(false);
+        rightChallengeButton.setVisible(false);
     }
 }

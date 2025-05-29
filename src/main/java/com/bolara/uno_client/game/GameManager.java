@@ -138,7 +138,7 @@ public class GameManager {
         }
     }
 
-public void challengeDrawFour(int playerIndex) {
+    public void challengeDrawFour(int playerIndex) {
         if (gameId == null) {
             System.err.println("Game ID is null. Cannot challenge Draw Four.");
             return;

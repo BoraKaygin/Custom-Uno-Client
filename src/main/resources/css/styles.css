@@ -71,6 +71,33 @@ ImageView {
     -fx-font-weight: bold;
 }
 
+.button-uno {
+    -fx-background-color: #ffdddd;
+    -fx-text-fill: #990000;
+    -fx-font-weight: bold;
+
+    -fx-pref-width: 80;
+    -fx-max-width: 80;
+    -fx-min-width: 80;
+
+    -fx-padding: 4 8 4 8;
+    -fx-font-size: 12px;
+}
+
+.button-challenge {
+    -fx-background-color: #ffdddd;
+    -fx-text-fill: #990000;
+    -fx-font-weight: bold;
+
+    -fx-pref-width: 80;
+    -fx-max-width: 80;
+    -fx-min-width: 80;
+
+    -fx-padding: 4 8 4 8;
+    -fx-font-size: 12px;
+}
+
+
 
 /* text fields */
 .text-field, .password-field {
