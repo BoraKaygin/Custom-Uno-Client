@@ -13,6 +13,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+import javafx.animation.PauseTransition;
+import javafx.util.Duration;
 
 
 import java.util.List;
@@ -22,6 +24,7 @@ public class LobbyUIController {
     @FXML private Label lobbyCodeLabel;
     @FXML private ListView<String> playerListView;
     @FXML private Button startGameButton;
+    @FXML private Button copyButton;
 
     private final GameManager gameManager = GameManager.getInstance();
 
@@ -60,12 +63,21 @@ public class LobbyUIController {
     }
     @FXML
     private void handleCopyLobbyId() {
-        String lobbyId = lobbyCodeLabel.getText();
-        Clipboard clipboard = Clipboard.getSystemClipboard();
-        ClipboardContent content = new ClipboardContent();
+        final String lobbyId = lobbyCodeLabel.getText();
+
+        // Copy to clipboard
+        final Clipboard clipboard = Clipboard.getSystemClipboard();
+        final ClipboardContent content = new ClipboardContent();
         content.putString(lobbyId);
         clipboard.setContent(content);
-        System.out.println("Lobby ID copied: " + lobbyId);
+
+        // Set button text to "Copied"
+        copyButton.setText("Copied!");
+
+        // Revert back to "Copy" after 1.5 seconds
+        PauseTransition pause = new PauseTransition(Duration.seconds(1.5));
+        pause.setOnFinished(e -> copyButton.setText("Copy"));
+        pause.play();
     }
 
 }

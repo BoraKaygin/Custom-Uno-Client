@@ -5,6 +5,7 @@ import com.bolara.uno_client.config.Constants;
 import com.bolara.uno_client.game.GameManager;
 import com.bolara.uno_client.service.AuthService;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextInputDialog;
 import javafx.util.Pair;
@@ -72,10 +73,26 @@ public class MenuUIController {
             System.out.println("User entered lobby ID: " + lobbyId);
             // joinMultiplayerGame()
             // StageManager.switchScene(Constants.SCENE_LOBBY);
-            GameManager.getInstance().joinMultiplayerGame(lobbyId);
-            StageManager.switchScene(Constants.SCENE_LOBBY);
+            boolean joined = GameManager.getInstance().joinMultiplayerGame(lobbyId);
 
+            if (joined) {
+                StageManager.switchScene(Constants.SCENE_LOBBY);
+            } else {
+                showError("Invalid Lobby ID. Could not join the lobby.");
+            }
+
+            //GameManager.getInstance().joinMultiplayerGame(lobbyId);
+            //StageManager.switchScene(Constants.SCENE_LOBBY);
         });
+
+    }
+
+    private void showError(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
 

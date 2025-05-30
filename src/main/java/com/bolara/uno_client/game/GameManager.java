@@ -60,11 +60,18 @@ public class GameManager {
         assert playerIndex >= 0;
     }
 
-    public void joinMultiplayerGame(String gameId) {
-        playerIndex = joinGame(gameId);
-        assert playerIndex >= 0;
-        this.gameId = gameId;
+    public boolean joinMultiplayerGame(String gameId) {
+        int index = joinGame(gameId);
+        if (index >= 0) {
+            this.playerIndex = index;
+            this.gameId = gameId;
+            return true;
+        } else {
+            System.err.println("Failed to join game: " + gameId);
+            return false;
+        }
     }
+
 
     public void startMultiplayerGame() {
         if (playerIndex != 0) {

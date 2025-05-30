@@ -10,13 +10,19 @@
     <HBox spacing="10" alignment="CENTER">
         <Label text="Lobby ID:" style="-fx-font-size: 16px;" />
         <Label fx:id="lobbyCodeLabel" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
-        <Button text="Copy" onAction="#handleCopyLobbyId" />
+        <Button fx:id="copyButton"
+                text="Copy"
+                onAction="#handleCopyLobbyId"
+                styleClass="copy-button" />
     </HBox>
 
 
-    <ListView fx:id="playerListView" prefWidth="300" prefHeight="200"/>
+    <ListView fx:id="playerListView"
+              prefWidth="400"
+              maxWidth="400"
+              prefHeight="200"/>
 
-    <Button fx:id="startGameButton" text="Start Game" onAction="#handleStartGame" visible="false"/>
+    <Button fx:id="startGameButton" text="Start Game" onAction="#handleStartGame" visible="false" styleClass="button-type5"/>
 
-    <Button text="Back to Menu" onAction="#handleBackToMenu"/>
+    <Button text="Back to Menu" onAction="#handleBackToMenu" styleClass="button-type3"/>
 </VBox>

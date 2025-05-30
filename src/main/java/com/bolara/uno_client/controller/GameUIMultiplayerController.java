@@ -80,7 +80,6 @@ public class GameUIMultiplayerController {
     private int playerIndex = -1;
 
     private boolean promptUp = false;
-    private boolean challengeActive = true;  // Tracks if challenge is still valid
 
 
     @FXML
@@ -186,24 +185,28 @@ public class GameUIMultiplayerController {
                 boolean showUno = isLocal && !player.hasCalledUno();
 
                 switch (i) {
-                    case 0 -> bottomCallUnoButton.setVisible(showUno);
-                    case 1 -> leftCallUnoButton.setVisible(showUno);
-                    case 2 -> topCallUnoButton.setVisible(showUno);
-                    case 3 -> rightCallUnoButton.setVisible(showUno);
+                    case 0: {
+                        bottomCallUnoButton.setVisible(showUno);
+                        bottomChallengeButton.setVisible(isLocal);
+                        break;
+                    }
+                    case 1: {
+                        leftCallUnoButton.setVisible(showUno);
+                        leftChallengeButton.setVisible(isLocal);
+                        break;
+                    }
+                    case 2: {
+                        topCallUnoButton.setVisible(showUno);
+                        topChallengeButton.setVisible(isLocal);
+                        break;
+                    }
+                    case 3: {
+                        rightCallUnoButton.setVisible(showUno);
+                        rightChallengeButton.setVisible(isLocal);
+                        break;
+                    }
                 }
             }
-
-            Card topCard = gameView.topCard();
-            boolean isWildDrawFour = topCard != null && topCard.type() == Card.Type.WILD_DRAW_FOUR;
-
-            // Only show challenge button if it's this player's turn, top card is Wild Draw Four,
-            // and challenge hasn't been used yet
-            if (isWildDrawFour && gameView.currentTurn() == playerIndex && challengeActive) {
-                showOnlyLocalPlayerChallengeButton();
-            } else {
-                hideAllChallengeButtons();
-            }
-
 
         });
 
@@ -465,24 +468,7 @@ public class GameUIMultiplayerController {
 
     @FXML
     private void handleChallengeDrawFour() {
-        challengeActive = false;
         gameManager.challengeDrawFour(playerIndex);  // notify backend
-        hideAllChallengeButtons();                   // hide after clicking
     }
 
-    private void showOnlyLocalPlayerChallengeButton() {
-        switch (playerIndex) {
-            case 0 -> bottomChallengeButton.setVisible(true);
-            case 1 -> leftChallengeButton.setVisible(true);
-            case 2 -> topChallengeButton.setVisible(true);
-            case 3 -> rightChallengeButton.setVisible(true);
-        }
-    }
-
-    private void hideAllChallengeButtons() {
-        bottomChallengeButton.setVisible(false);
-        leftChallengeButton.setVisible(false);
-        topChallengeButton.setVisible(false);
-        rightChallengeButton.setVisible(false);
-    }
 }
