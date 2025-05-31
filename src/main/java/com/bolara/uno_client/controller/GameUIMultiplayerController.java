@@ -273,6 +273,9 @@ public class GameUIMultiplayerController {
             case DRAW_TWO -> "_draw2.png";
             case WILD_CHANGE_COLOR -> "_wild.png";
             case WILD_DRAW_FOUR -> "_wild_draw.png";
+            case WILD_SWAP_HANDS -> "_swap_hands.jpg";
+            case WILD_SKIP_ALL -> "_skip_all.jpg";
+            case WILD_COLOR_DRAW -> "_color_draw.jpg";
         };
 
         String baseImage = switch (card.color()) {
@@ -397,6 +400,9 @@ public class GameUIMultiplayerController {
             case DRAW_TWO -> "_draw2.png";
             case WILD_CHANGE_COLOR -> "_wild.png";
             case WILD_DRAW_FOUR -> "_wild_draw.png";
+            case WILD_SWAP_HANDS -> "_swap_hands.jpg";
+            case WILD_SKIP_ALL -> "_skip_all.jpg";
+            case WILD_COLOR_DRAW -> "_color_draw.jpg";
         };
 
         String baseImage = switch (topCard.color()) {

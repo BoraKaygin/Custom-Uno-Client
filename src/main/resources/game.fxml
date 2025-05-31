@@ -33,6 +33,10 @@
         <bottom>
             <VBox alignment="CENTER" spacing="20" styleClass="border">
                 <Label fx:id="playerUnoLabel" text="UNO!" visible="false" styleClass="uno-label"/>
+                <HBox alignment="CENTER" spacing="10">
+                    <Button text="Say UNO!" onAction="#handleCallUno" styleClass="button-uno" />
+                    <Button text="Challenge" onAction="#handleChallengeDrawFour" styleClass="button-challenge"/>
+                </HBox>
                 <HBox fx:id="playerHand" spacing="1" alignment="CENTER" styleClass="player-hand" />
                 <Label fx:id="playerNameLabel" text="You" styleClass="player-name"/>
                 <HBox alignment="CENTER" spacing="5">
@@ -40,7 +44,10 @@
                     <Button text="Reverse" onAction="#handleCheatReverse" styleClass="button-game" />
                     <Button text="Draw Two" onAction="#handleCheatDrawTwo" styleClass="button-game" />
                     <Button text="Wild" onAction="#handleCheatWild" styleClass="button-game" />
-                    <Button text="Wild Draw Four" onAction="#handleCheatWildDrawFour" styleClass="button-game" />
+                    <Button text="Wild Draw 4" onAction="#handleCheatWildDrawFour" styleClass="button-game" />
+                    <Button text="Skip All" onAction="#handleCheatSkipAll" styleClass="button-game" />
+                    <Button text="Swap Hands" onAction="#handleCheatSwapHands" styleClass="button-game" />
+                    <Button text="Color Draw" onAction="#handleCheatColorDraw" styleClass="button-game" />
                 </HBox>
                 <!-- Spacer to add gap below -->
                 <Region minHeight="10" />

@@ -216,6 +216,9 @@ public class GameUIController {
             case DRAW_TWO -> "_draw2.png";
             case WILD_CHANGE_COLOR -> "_wild.png";
             case WILD_DRAW_FOUR -> "_wild_draw.png";
+            case WILD_SWAP_HANDS -> "_swap_hands.jpg";
+            case WILD_SKIP_ALL -> "_skip_all.jpg";
+            case WILD_COLOR_DRAW -> "_color_draw.jpg";
         };
 
         String baseImage = switch (card.color()) {
@@ -268,7 +271,7 @@ public class GameUIController {
         return -1; // Not found
     }
 
-    @FXML  // here, instead of red, put the game's current color (top card of the discard pile)
+    @FXML
     private void handleCheatSkip() {
         Card.Color color = Objects.requireNonNull(gameManager.getGame().getTopCard()).color();
         Card cheatCard = new Card(color, Type.SKIP, -1);
@@ -276,23 +279,22 @@ public class GameUIController {
     }
 
 
-    @FXML  // here, instead of red, put the game's current color (top card of the discard pile)
+    @FXML
     private void handleCheatReverse() {
         Card.Color color = Objects.requireNonNull(gameManager.getGame().getTopCard()).color();
         Card cheatCard = new Card(color, Type.REVERSE, -1);
         gameManager.playCheatCard(playerIndex, cheatCard);
     }
 
-    @FXML  // here, instead of red, put the game's current color (top card of the discard pile)
+    @FXML
     private void handleCheatDrawTwo() {
         Card.Color color = Objects.requireNonNull(gameManager.getGame().getTopCard()).color();
         Card cheatCard = new Card(color, Type.DRAW_TWO, -1);
         gameManager.playCheatCard(playerIndex, cheatCard);
     }
 
-    @FXML  // here, instead of red, put the game's current color (top card of the discard pile)
+    @FXML
     private void handleCheatWild() {
-        ;
         Card cheatCard = new Card(Card.Color.WILD, Type.WILD_CHANGE_COLOR, -1);
         cheatCard = promptColorSelection(cheatCard);
         gameManager.playCheatCard(playerIndex, cheatCard);
@@ -301,6 +303,27 @@ public class GameUIController {
     @FXML
     private void handleCheatWildDrawFour() {
         Card cheatCard = new Card(Card.Color.WILD, Type.WILD_DRAW_FOUR, -1);
+        cheatCard = promptColorSelection(cheatCard);
+        gameManager.playCheatCard(playerIndex, cheatCard);
+    }
+
+    @FXML
+    private void handleCheatSkipAll() {
+        Card cheatCard = new Card(Card.Color.WILD, Type.WILD_SKIP_ALL, -1);
+        cheatCard = promptColorSelection(cheatCard);
+        gameManager.playCheatCard(playerIndex, cheatCard);
+    }
+
+    @FXML
+    private void handleCheatSwapHands() {
+        Card cheatCard = new Card(Card.Color.WILD, Type.WILD_SWAP_HANDS, -1);
+        cheatCard = promptColorSelection(cheatCard);
+        gameManager.playCheatCard(playerIndex, cheatCard);
+    }
+
+    @FXML
+    private void handleCheatColorDraw() {
+        Card cheatCard = new Card(Card.Color.WILD, Type.WILD_COLOR_DRAW, -1);
         cheatCard = promptColorSelection(cheatCard);
         gameManager.playCheatCard(playerIndex, cheatCard);
     }
@@ -365,6 +388,17 @@ public class GameUIController {
         rightUnoLabel.setVisible(hands.get(3).calledUno());
     }
 
+    @FXML
+    private void handleCallUno() {
+        gameManager.callUno(playerIndex);
+    }
+
+    @FXML
+    private void handleChallengeDrawFour() {
+        gameManager.challengeDrawFour(playerIndex);
+    }
+
+
     private void showTopCard(Game game) {
         if (game.discardPile().isEmpty()) return;
 
@@ -377,6 +411,9 @@ public class GameUIController {
             case DRAW_TWO -> "_draw2.png";
             case WILD_CHANGE_COLOR -> "_wild.png";
             case WILD_DRAW_FOUR -> "_wild_draw.png";
+            case WILD_SWAP_HANDS -> "_swap_hands.jpg";
+            case WILD_SKIP_ALL -> "_skip_all.jpg";
+            case WILD_COLOR_DRAW -> "_color_draw.jpg";
         };
 
         String baseImage = switch (topCard.color()) {

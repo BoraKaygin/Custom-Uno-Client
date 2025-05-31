@@ -69,6 +69,10 @@ ImageView {
     -fx-background-color: #ffdddd;
     -fx-text-fill: #990000;
     -fx-font-weight: bold;
+
+    -fx-pref-width: 125;
+    -fx-max-width: 125;
+    -fx-min-width: 125;
 }
 
 .button-uno {
